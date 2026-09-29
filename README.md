@@ -5,7 +5,7 @@
 - **오늘**: D-day·연속 공부일·오늘 공부시간 카드, 캐릭터 응원, 그날 계획 체크와 실제 시간 기록, 계획에 없던 공부는 "공부 기록 추가하기"
 - **계획·성장**: D-day·연속 공부일·총 공부시간, 캐릭터 성장/도감, 달력(날짜별 공부 여부·시간), 전체 계획 보기
 - **계획 수정**: 달력·전체 계획에서 날짜를 누르면 수정·추가·삭제 가능. 기본 계획(plan.js)은 그대로 두고 고친 내용만 기기에 저장되며 "원래대로"로 되돌릴 수 있습니다.
-- 폰트: 제목·숫자 Jua(Google Fonts), 본문 Pretendard(jsDelivr)
+- 폰트: 제목·숫자 Jua, 본문 Pretendard — `fonts/` 폴더에 포함(외부 CDN 없이 오프라인에서도 표시, 둘 다 SIL OFL 1.1)
 
 ## 사용자 · 시험
 - 처음 열면 **사용자 만들기**: 이름(중복 불가) + 비밀번호 4자리 → 캐릭터(병아리 / 아기 원숭이 / 핑크곰) → 시험(정보처리기사 실기 / AWS SAA-C03 / 직접 등록) → 시험일·시작일 → 평일/주말 공부 가능 시간 → 계획 방식
@@ -17,7 +17,7 @@
 주소: https://jimin7016-spec.github.io/ssukssuk-study/
 
 ## 파일
-index.html / app.js / plan.js(날짜별 계획 데이터) / sw.js(오프라인 캐시) / manifest.webmanifest / icon-*.png
+index.html / app.js / plan.js(정처기 기본 계획) / sw.js(오프라인 캐시) / manifest.webmanifest / icon-*.png / fonts/(글꼴)
 
 ## 미리보기
 - 폴더의 index.html 을 더블클릭하거나, 터미널에서 `python3 -m http.server` 후 http://localhost:8000
@@ -41,4 +41,4 @@ index.html / app.js / plan.js(날짜별 계획 데이터) / sw.js(오프라인 �
 
 ## 주의
 - 체크·실제 시간은 기기별 localStorage 에 저장됩니다. 폰과 PC는 서로 동기화되지 않으니 "계획·성장" 화면 하단의 내보내기/가져오기로 옮기세요.
-- 계획(plan.js)이나 화면을 고쳐 다시 올리면 sw.js 맨 위 `CACHE = "itp-v7"` 숫자를 올려야 폰에 반영됩니다.
+- 계획(plan.js)이나 화면을 고쳐 다시 올리면 sw.js 맨 위 `CACHE = "itp-v8"` 숫자를 올려야 폰에 반영됩니다.

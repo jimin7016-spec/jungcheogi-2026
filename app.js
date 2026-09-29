@@ -836,19 +836,6 @@
     add.addEventListener("click", function () { openExtraSheet(iso, null); });
     ui.body.append(add);
 
-    var memo = el("section", "card memo");
-    var ta = document.createElement("textarea");
-    ta.id = "memo-" + iso;
-    var ml = el("label", null, "오늘 틀린 이유 한 줄");
-    ml.htmlFor = ta.id;
-    ta.placeholder = "예: 3NF 조건 자꾸 잊음, C 포인터 증감 순서 헷갈림";
-    ta.value = typeof state.memo[iso] === "string" ? state.memo[iso] : "";
-    ta.addEventListener("input", function () {
-      if (ta.value) state.memo[iso] = ta.value; else delete state.memo[iso];
-      save();
-    });
-    memo.append(ml, ta);
-    ui.body.append(memo);
   }
 
   function updateToday() {

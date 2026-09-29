@@ -14,11 +14,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&display=swap">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="preload" href="fonts/pretendard/Pretendard-SemiBold.subset.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts/fonts.css">
 <style>
 /* Layout: 폰 한 컬럼(최대 480px). 두 화면 모두 위에 벤토 그리드(D-day 큰 카드 + 연속 공부 + 오늘/총 공부),
    그 아래 병아리가 사는 하늘색 펫 카드, 이어서 할 일·달력 카드가 쌓인다. 하단 탭바 두 개.
@@ -52,8 +49,8 @@
   --r-card: 24px;
   --r-btn: 16px;
   --tabh: 68px;
-  --font-cute: "Jua", "Pretendard Variable", Pretendard, sans-serif;
-  --font-body: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+  --font-cute: "Jua", "Pretendard", sans-serif;
+  --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -224,8 +221,6 @@ h1, h2, h3, p { margin: 0; }
 .extra-row .x-min { font: 400 16px var(--font-cute); color: var(--orange-text); font-variant-numeric: tabular-nums; }
 .add-btn { min-height: 58px; font-size: 18px; }
 
-.memo label { display: block; font: 400 17px var(--font-cute); margin-bottom: 8px; }
-.memo textarea { width: 100%; min-height: 76px; resize: vertical; border: 2px solid var(--card-line); border-radius: 16px; padding: 11px 13px; background: #FFFDF5; font-size: 14.5px; font-weight: 500; }
 
 /* ---------- 계획·성장 ---------- */
 .dex { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
@@ -316,7 +311,7 @@ h1, h2, h3, p { margin: 0; }
 .field > span { font: 400 16px var(--font-cute); }
 .field input[type="text"], .field input[type="number"], .field textarea { width: 100%; min-height: 48px; border: 2px solid var(--card-line); border-radius: var(--r-btn); padding: 11px 13px; background: #fff; font-size: 15.5px; font-weight: 500; }
 .field textarea { min-height: 68px; resize: vertical; font-size: 14.5px; }
-.field input:focus, .field textarea:focus, .memo textarea:focus { outline: none; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255, 210, 63, .35); }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--yellow); box-shadow: 0 0 0 3px rgba(255, 210, 63, .35); }
 .pick { display: flex; flex-wrap: wrap; gap: 7px; }
 .pick button { min-height: 44px; padding: 0 15px; border-radius: 999px; border: 2px solid var(--card-line); border-bottom-width: 3px; background: #fff; font: 400 15px var(--font-cute); }
 .pick button[aria-pressed="true"] { background: var(--yellow); border-color: var(--yellow-edge); }
