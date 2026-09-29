@@ -1,4 +1,5 @@
-// 교재 PART 01~08 기준 일정 데이터 (9/29 ~ 10/25)
+// 정보처리기사 실기 기본 커리큘럼 (교재 PART 01~08, 2026-09-29 ~ 10-25)
+// 날짜별 항목 순서는 바꾸지 마세요: 체크·실제 시간 기록이 '날짜-순서' 로 연결되어 있습니다.
 const PLAN = {
  "parts": [
   {
@@ -45,27 +46,27 @@ const PLAN = {
  "phases": [
   {
    "key": "p1",
-   "name": "진단과 PART 01·02",
+   "name": "1주차 · 진단 / PART 01–02",
    "range": "9/29 ~ 10/5",
-   "desc": "기출로 약점을 확인하고 PART 01 소프트웨어 구축과 PART 02 데이터베이스를 읽습니다. 코드는 교재 목차에 파트가 없어서 기출로 따로 연습합니다."
+   "desc": "기출 진단 → PART 01 소프트웨어 구축 → PART 02 데이터베이스 구축 · 코드(C, Java) 기출 병행"
   },
   {
    "key": "p2",
-   "name": "PART 03~06과 SQL 시작",
+   "name": "2주차 · PART 03–06 / SQL 입문",
    "range": "10/6 ~ 10/12",
-   "desc": "운영체제, 네트워크, 정보보안, 신기술 용어를 마치고 10/12부터 SQL에 들어갑니다. 10/11은 쉽니다."
+   "desc": "운영체제 → 네트워크 → 정보보안 → 신기술 용어 · 코드(Python) 기출 · 10/11 휴식 · 10/12 SQL 시작"
   },
   {
    "key": "p3",
-   "name": "SQL·계산식과 첫 모의고사",
+   "name": "3주차 · SQL / 계산식 / 모의고사",
    "range": "10/13 ~ 10/18",
-   "desc": "SQL과 계산식은 손으로 풀어야 점수가 됩니다. 10/18에 첫 모의고사를 봅니다."
+   "desc": "PART 07 SQL·관계 데이터 언어 → PART 08 계산식 · 10/18 모의고사 1회"
   },
   {
    "key": "p4",
-   "name": "오답 보강과 마무리",
+   "name": "4주차 · 오답 보강 / 마무리",
    "range": "10/19 ~ 10/25",
-   "desc": "모의고사 오답으로 약한 PART를 다시 보고, 마지막 이틀은 오답노트와 서술형 표기 연습으로 마무리합니다."
+   "desc": "모의고사 오답 분석 → 약점 PART 재학습 → 영역별 회독 → 오답노트 · 답안 표기 점검"
   }
  ],
  "days": [
@@ -78,22 +79,22 @@ const PLAN = {
    "dd": "D-26",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "진단: 기출 이론 문제 채점",
-     "detail": "최근 기출 1회분에서 이론 문제만 풀고 채점합니다. 틀린 문제마다 교재 PART 번호를 적어 두면 뒤 일정에서 어디를 더 볼지 정할 수 있습니다."
+     "title": "진단 평가 · 이론",
+     "detail": "최근 기출 1회분 이론 문항 풀이 · 채점 · 오답별 교재 PART 표기"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "진단: 기출 코드·SQL 문제",
-     "detail": "손으로 추적하며 풉니다. 막힌 언어와 유형을 기록하세요. 보내주신 목차에는 C·Java·Python 코드 파트가 없어서, 코드는 기출로 따로 연습합니다."
+     "title": "진단 평가 · 코드 / SQL",
+     "detail": "최근 기출 코드·SQL 문항 손 추적 풀이 · 취약 언어와 유형 기록"
     }
    ],
    "plan": 90,
@@ -108,26 +109,26 @@ const PLAN = {
    "dd": "D-25",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.8–15",
-     "title": "소프트웨어 공학과 개발 방법론",
-     "detail": "폭포수·프로토타입·나선형·애자일(XP, 스크럼)을 특징 한 줄씩으로 구분해 외우기."
+     "title": "소프트웨어 공학 · 개발 방법론",
+     "detail": "폭포수 · 프로토타입 · 나선형 · 애자일(XP, 스크럼) 특징 비교"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.16–29",
-     "title": "프로젝트 계획과 요구사항 분석",
-     "detail": "비용 산정(COCOMO, 기능점수), PERT·CPM 일정, 요구공학 단계와 유스케이스."
+     "title": "프로젝트 계획 · 요구사항 분석",
+     "detail": "비용 산정(COCOMO, 기능 점수) · 일정 관리(PERT, CPM) · 요구공학 절차 · 유스케이스"
     }
    ],
    "plan": 90,
@@ -142,26 +143,26 @@ const PLAN = {
    "dd": "D-24",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.30–36",
-     "title": "설계 기본 원칙과 아키텍처",
-     "detail": "추상화·모듈화·정보 은닉, 결합도와 응집도의 종류를 순서대로. 아키텍처 패턴(MVC, 레이어, 파이프-필터)."
+     "title": "설계 원칙 · 소프트웨어 아키텍처",
+     "detail": "추상화 · 모듈화 · 정보 은닉 · 결합도와 응집도 종류와 순서 · 아키텍처 패턴(MVC, 레이어, 파이프-필터)"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.37–46",
-     "title": "UML과 화면 설계",
-     "detail": "클래스·시퀀스·유스케이스 다이어그램, 관계 표기(연관·집합·합성·일반화·의존). UI 설계 원칙과 프로토타입 종류."
+     "title": "UML · 화면 설계",
+     "detail": "클래스 · 시퀀스 · 유스케이스 다이어그램 · 관계(연관, 집합, 합성, 일반화, 의존) · UI 설계 원칙 · 프로토타입"
     }
    ],
    "plan": 90,
@@ -176,26 +177,26 @@ const PLAN = {
    "dd": "D-23",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "c",
      "parts": [
       "01"
      ],
      "pages": "p.47–50",
-     "title": "프로그래밍 기초 개념",
-     "detail": "변수·자료형·연산자·제어문을 훑고, 기출 코드 문제 2개를 손 추적으로 풀어 보기."
+     "title": "프로그래밍 기초",
+     "detail": "변수 · 자료형 · 연산자 · 제어문 · 기출 코드 2문항 손 추적"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.51–63",
-     "title": "개발 환경 구축과 모듈 구현",
-     "detail": "형상 관리(Git, SVN), 빌드 도구, 단위 모듈 개념. 용어 위주로 빠르게."
+     "title": "개발 환경 구축 · 모듈 구현",
+     "detail": "형상 관리(Git, SVN) · 빌드 도구 · 단위 모듈"
     }
    ],
    "plan": 90,
@@ -210,35 +211,35 @@ const PLAN = {
    "dd": "D-22",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.64–77",
-     "title": "서버 프로그램 구현과 인터페이스 구현",
-     "detail": "연계 방식(EAI, ESB, API, DB 링크), 인터페이스 데이터 포맷(JSON, XML), 구현 검증 도구."
+     "title": "서버 프로그램 구현 · 인터페이스 구현",
+     "detail": "연계 방식(EAI, ESB, API, DB 링크) · 데이터 포맷(JSON, XML) · 인터페이스 검증 도구"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.78–91",
-     "title": "객체지향 설계와 테스트케이스 설계",
-     "detail": "캡슐화·상속·다형성, 디자인 패턴이 나오면 함께. 블랙박스·화이트박스와 커버리지 종류."
+     "title": "객체지향 설계 · 테스트 케이스 설계",
+     "detail": "캡슐화 · 상속 · 다형성 · 디자인 패턴 · 블랙박스 / 화이트박스 테스트 · 커버리지"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "코드 연습 C: 기출 코드 문제",
-     "detail": "포인터·배열·반복문 중심으로 10문제. 변수 값이 바뀌는 과정을 표로 그리며 풉니다."
+     "title": "코드 실습 · C",
+     "detail": "기출 10문항 · 포인터 · 배열 · 반복문 · 변수 추적 표 작성"
     }
    ],
    "plan": 180,
@@ -253,37 +254,37 @@ const PLAN = {
    "dd": "D-21",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "01"
      ],
      "pages": "p.92–102",
-     "title": "통합 테스트, 유지보수, 패키징",
-     "detail": "상향·하향 통합과 스텁·드라이버, 유지보수 4유형, 릴리즈 노트와 버전 관리."
+     "title": "통합 테스트 · 유지보수 · 패키징",
+     "detail": "상향식 / 하향식 통합 · 스텁과 드라이버 · 유지보수 유형 · 릴리즈 노트 · 버전 관리"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "02"
      ],
      "pages": "p.104–117",
-     "title": "DB 개념, 설계, 논리 설계",
-     "detail": "스키마 3계층, 설계 단계, 키 종류, 무결성. 정규화(1NF~BCNF)는 예제로 직접 풀기."
+     "title": "데이터베이스 개념 · 논리 설계",
+     "detail": "스키마 3계층 · 설계 단계 · 키 · 무결성 · 정규화(1NF~BCNF) 예제 풀이"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "02"
      ],
      "pages": "p.118–128",
-     "title": "물리 설계와 관계형 데이터베이스",
-     "detail": "인덱스, 파티션, 반정규화. 릴레이션 용어(속성, 튜플, 차수, 카디널리티)."
+     "title": "물리 설계 · 관계형 데이터베이스",
+     "detail": "인덱스 · 파티션 · 반정규화 · 릴레이션 용어(속성, 튜플, 차수, 카디널리티)"
     }
    ],
    "plan": 180,
@@ -298,35 +299,35 @@ const PLAN = {
    "dd": "D-20",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "02"
      ],
      "pages": "p.129–140",
-     "title": "분산 DB, 병행 제어, 데이터 전환",
-     "detail": "분산 투명성 종류, 트랜잭션 ACID, 로킹과 2PL, 회복 기법, 데이터 전환(ETL)."
+     "title": "분산 DB · 병행 제어 · 데이터 전환",
+     "detail": "분산 투명성 · 트랜잭션 ACID · 로킹과 2PL · 회복 기법 · ETL"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "03"
      ],
      "pages": "p.142–153",
-     "title": "운영체제 기초와 메모리 관리",
-     "detail": "운영체제 기능, 가상 메모리, 페이징·세그먼테이션, 단편화, 배치 전략 3가지."
+     "title": "운영체제 기초 · 메모리 관리",
+     "detail": "운영체제 기능 · 가상 메모리 · 페이징 / 세그먼테이션 · 단편화 · 배치 전략"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "코드 연습 Java: 기출 코드 문제",
-     "detail": "상속·오버라이딩·static·생성자 호출 순서·예외 흐름 10문제."
+     "title": "코드 실습 · Java",
+     "detail": "기출 10문항 · 상속 · 오버라이딩 · static · 생성자 호출 순서 · 예외 처리"
     }
    ],
    "plan": 180,
@@ -341,18 +342,18 @@ const PLAN = {
    "dd": "D-19",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
       "03"
      ],
      "pages": "p.154–161",
-     "title": "프로세스와 교착 상태",
-     "detail": "프로세스 상태 전이, 스레드, 교착 상태 4조건과 회피·예방·회복."
+     "title": "프로세스 · 교착 상태",
+     "detail": "프로세스 상태 전이 · 스레드 · 교착 상태 발생 조건 · 예방 / 회피 / 회복"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
@@ -360,8 +361,8 @@ const PLAN = {
       "04"
      ],
      "pages": "p.162–166, 168–173",
-     "title": "디스크 스케줄링 개념, 스토리지 용어, 네트워크 기본",
-     "detail": "SCAN·C-SCAN·LOOK 차이, RAID 레벨. 토폴로지와 회선·패킷 교환."
+     "title": "디스크 · 스토리지 · 네트워크 기초",
+     "detail": "디스크 스케줄링(SCAN, C-SCAN, LOOK) · RAID · 토폴로지 · 회선 / 패킷 교환"
     }
    ],
    "plan": 90,
@@ -376,7 +377,7 @@ const PLAN = {
    "dd": "D-18",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
@@ -384,7 +385,7 @@ const PLAN = {
      ],
      "pages": "p.174–178",
      "title": "근거리 통신망(LAN)",
-     "detail": "LAN 토폴로지, 이더넷과 CSMA/CD, MAC 주소."
+     "detail": "LAN 토폴로지 · 이더넷 · CSMA/CD · MAC 주소"
     }
    ],
    "plan": 30,
@@ -399,7 +400,7 @@ const PLAN = {
    "dd": "D-17",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
@@ -407,7 +408,7 @@ const PLAN = {
      ],
      "pages": "p.179–183",
      "title": "인터넷",
-     "detail": "IPv4·IPv6 주소 체계, 라우팅과 DNS, 스위치와 라우터 구분."
+     "detail": "IPv4 / IPv6 주소 체계 · 라우팅 · DNS · 스위치와 라우터"
     }
    ],
    "plan": 30,
@@ -422,18 +423,18 @@ const PLAN = {
    "dd": "D-16",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "04"
      ],
      "pages": "p.184–193",
-     "title": "프로토콜과 OSI 7계층",
-     "detail": "HTTP·FTP·SMTP·DHCP·ARP·ICMP 역할, OSI 계층별 기능과 장비를 표로 정리."
+     "title": "프로토콜 · OSI 7계층",
+     "detail": "HTTP · FTP · SMTP · DHCP · ARP · ICMP · 계층별 기능과 장비 정리표"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
@@ -441,17 +442,17 @@ const PLAN = {
       "05"
      ],
      "pages": "p.194–200, 202–206",
-     "title": "TCP/IP와 SW 개발 보안 설계",
-     "detail": "TCP·UDP 비교, 3-way handshake, 라우팅 프로토콜. 보안 3요소와 접근 통제(DAC, MAC, RBAC)."
+     "title": "TCP/IP · SW 개발 보안 설계",
+     "detail": "TCP / UDP · 3-way handshake · 라우팅 프로토콜 · 보안 3요소 · 접근 통제(DAC, MAC, RBAC)"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "코드 연습 Python: 기출 코드 문제",
-     "detail": "리스트 슬라이싱, 딕셔너리, 컴프리헨션, 클래스 상속 10문제."
+     "title": "코드 실습 · Python",
+     "detail": "기출 10문항 · 슬라이싱 · 딕셔너리 · 컴프리헨션 · 클래스 상속"
     }
    ],
    "plan": 180,
@@ -466,18 +467,18 @@ const PLAN = {
    "dd": "D-15",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
       "05"
      ],
      "pages": "p.207–219",
-     "title": "시큐어 코딩과 시스템 보안",
-     "detail": "입력 검증·세션 통제 같은 시큐어 코딩 항목, 대칭·비대칭 암호와 해시, 방화벽·IDS·IPS."
+     "title": "시큐어 코딩 · 시스템 보안",
+     "detail": "시큐어 코딩 항목(입력 검증, 세션 통제 등) · 대칭 / 비대칭 암호 · 해시 · 방화벽 · IDS · IPS"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "t",
      "parts": [
@@ -485,19 +486,19 @@ const PLAN = {
       "06"
      ],
      "pages": "p.220–226, 228–233",
-     "title": "서비스 공격 유형과 SW 개발 동향",
-     "detail": "DoS·DDoS 종류, 스니핑·스푸핑, 피싱·파밍·스미싱, XSS·CSRF. 클라우드·빅데이터·블록체인 용어."
+     "title": "서비스 공격 · SW 개발 동향",
+     "detail": "DoS / DDoS · 스니핑 · 스푸핑 · 피싱 · 파밍 · 스미싱 · XSS · CSRF · 클라우드 · 빅데이터 · 블록체인"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [
       "06"
      ],
      "pages": "p.234–238",
-     "title": "신기술 용어 마무리와 이론 기출",
-     "detail": "네트워크·DB 신기술 용어를 보고, 남은 시간에 PART 03~06 범위의 기출 이론 문제를 풀어 오답을 표시합니다."
+     "title": "신기술 용어 · PART 03–06 기출",
+     "detail": "네트워크 · DB 신기술 용어 · PART 03–06 이론 기출 풀이 · 오답 표시"
     }
    ],
    "plan": 180,
@@ -523,26 +524,26 @@ const PLAN = {
    "dd": "D-13",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.240–246",
-     "title": "DDL",
-     "detail": "CREATE·ALTER·DROP, 제약조건(PK, FK, UNIQUE, CHECK), CASCADE와 RESTRICT."
+     "title": "SQL · DDL",
+     "detail": "CREATE · ALTER · DROP · 제약조건(PK, FK, UNIQUE, CHECK) · CASCADE / RESTRICT"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.247–262",
-     "title": "DCL과 DML (1)",
-     "detail": "GRANT·REVOKE, COMMIT·ROLLBACK·SAVEPOINT, INSERT·UPDATE·DELETE, SELECT 기본. 예제를 직접 치듯 풀기."
+     "title": "SQL · DCL / DML (1)",
+     "detail": "GRANT · REVOKE · COMMIT · ROLLBACK · SAVEPOINT · INSERT · UPDATE · DELETE · SELECT 기본"
     }
    ],
    "plan": 90,
@@ -557,26 +558,26 @@ const PLAN = {
    "dd": "D-12",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.263–271",
-     "title": "DML (2)",
-     "detail": "조건절, 정렬, 별칭, LIKE·IN·BETWEEN. 결과 테이블을 직접 그려서 확인."
+     "title": "SQL · DML (2)",
+     "detail": "WHERE 조건 · ORDER BY · 별칭 · LIKE · IN · BETWEEN · 결과 테이블 작성"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.272–287",
-     "title": "SELECT 집합 연산과 JOIN (1)",
-     "detail": "UNION·UNION ALL·INTERSECT·EXCEPT, INNER JOIN과 OUTER JOIN의 결과 행 수 세기."
+     "title": "SQL · 집합 연산 / JOIN (1)",
+     "detail": "UNION · UNION ALL · INTERSECT · EXCEPT · INNER / OUTER JOIN 결과 행 수"
     }
    ],
    "plan": 90,
@@ -591,26 +592,26 @@ const PLAN = {
    "dd": "D-11",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.288–294",
-     "title": "JOIN (2)",
-     "detail": "SELF·CROSS·NATURAL JOIN, ON과 USING 차이."
+     "title": "SQL · JOIN (2)",
+     "detail": "SELF · CROSS · NATURAL JOIN · ON과 USING"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.295–309",
-     "title": "서브쿼리",
-     "detail": "단일행·다중행, IN·ANY·ALL·EXISTS, 상관 서브쿼리. 기출 5문제."
+     "title": "SQL · 서브쿼리",
+     "detail": "단일행 / 다중행 · IN · ANY · ALL · EXISTS · 상관 서브쿼리 · 기출 5문항"
     }
    ],
    "plan": 90,
@@ -625,18 +626,18 @@ const PLAN = {
    "dd": "D-10",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "s",
      "parts": [
       "07"
      ],
      "pages": "p.310–320",
-     "title": "집계 함수와 GROUP BY",
-     "detail": "COUNT·SUM·AVG, GROUP BY·HAVING, ROLLUP·CUBE, 순위 함수."
+     "title": "SQL · 집계 함수 / GROUP BY",
+     "detail": "COUNT · SUM · AVG · GROUP BY · HAVING · ROLLUP · CUBE · 순위 함수"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "s",
      "parts": [
@@ -644,7 +645,7 @@ const PLAN = {
      ],
      "pages": "p.321–334",
      "title": "관계 데이터 언어",
-     "detail": "관계대수의 순수 연산(σ, π, ⋈, ÷)과 일반 집합 연산, 관계해석의 정량자."
+     "detail": "관계대수(σ, π, ⋈, ÷) · 일반 집합 연산 · 관계해석"
     }
    ],
    "plan": 90,
@@ -659,15 +660,15 @@ const PLAN = {
    "dd": "D-9",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "p.336–341",
-     "title": "서브넷 (1)",
-     "detail": "서브넷 마스크와 CIDR 표기, 네트워크 주소 구하기. 문제 3개."
+     "title": "계산식 · 서브넷 (1)",
+     "detail": "서브넷 마스크 · CIDR · 네트워크 주소 계산 · 3문항"
     }
    ],
    "plan": 30,
@@ -682,37 +683,37 @@ const PLAN = {
    "dd": "D-8",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "p.342–350",
-     "title": "서브넷 (2)와 주기억장치 계산식",
-     "detail": "브로드캐스트 주소와 호스트 수, 서브넷 나누기. 주소 변환과 접근 시간 공식."
+     "title": "계산식 · 서브넷 (2) / 주기억장치",
+     "detail": "브로드캐스트 주소 · 호스트 수 · 서브넷 분할 · 주소 변환 · 접근 시간"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "p.351–364",
-     "title": "페이지 교체와 프로세스 스케줄링 (1)",
-     "detail": "FIFO·LRU·LFU 페이지 부재 횟수, FCFS·SJF·HRN의 대기시간 손계산."
+     "title": "계산식 · 페이지 교체 / 프로세스 스케줄링 (1)",
+     "detail": "FIFO · LRU · LFU 페이지 부재 횟수 · FCFS · SJF · HRN 대기 시간"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "p.365–378",
-     "title": "프로세스 스케줄링 (2)와 디스크 스케줄링",
-     "detail": "라운드 로빈·SRT·우선순위의 간트 차트, SSTF·SCAN·C-SCAN 헤드 이동 거리."
+     "title": "계산식 · 프로세스 스케줄링 (2) / 디스크 스케줄링",
+     "detail": "라운드 로빈 · SRT · 우선순위 간트 차트 · SSTF · SCAN · C-SCAN 이동 거리"
     }
    ],
    "plan": 180,
@@ -727,33 +728,33 @@ const PLAN = {
    "dd": "D-7",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "p.379~",
-     "title": "기타 계산식과 계산식 총정리",
-     "detail": "남은 공식을 정리한 뒤 서브넷·페이지 교체·스케줄링·디스크를 각 3문제씩 손계산."
+     "title": "계산식 · 기타 공식 / 총정리",
+     "detail": "잔여 공식 정리 · 서브넷 · 페이지 교체 · 스케줄링 · 디스크 각 3문항"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "첫 모의고사 (1/2)",
-     "detail": "기출 1회분을 시간 재고 풉니다. 실제 시험은 150분이라 2·3교시 120분 안에 풀고, 못 푼 문제는 표시만 하고 넘어갑니다."
+     "title": "모의고사 1회 (1/2)",
+     "detail": "기출 1회분 · 실전 시간 배분(총 120분) · 미해결 문항 표시"
     },
     {
-     "slot": "3교시 60분",
+     "slot": "3교시 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "첫 모의고사 (2/2)",
-     "detail": "이어서 풀고 마지막에 답안 표기를 검토합니다. 채점은 내일 점심에 합니다."
+     "title": "모의고사 1회 (2/2)",
+     "detail": "잔여 문항 풀이 · 답안 표기 검토 · 채점은 다음 날"
     }
    ],
    "plan": 180,
@@ -768,22 +769,22 @@ const PLAN = {
    "dd": "D-6",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "모의고사 채점과 오답 분류",
-     "detail": "틀린 문제마다 교재 PART를 적고 원인을 분류합니다: 개념 모름, 추적 실수, 표기 실수, 시간 부족."
+     "title": "모의고사 채점 · 오답 분류",
+     "detail": "오답별 교재 PART 표기 · 원인 분류(개념 · 추적 · 표기 · 시간)"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "코드 재추적: 틀린 코드 문제",
-     "detail": "답을 보지 않고 손으로 다시 추적합니다. 이번에도 틀리면 별표."
+     "title": "코드 오답 재풀이",
+     "detail": "해설 없이 손 추적 재풀이 · 재오답 별표"
     }
    ],
    "plan": 90,
@@ -798,16 +799,16 @@ const PLAN = {
    "dd": "D-5",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "약점 PART 재독 (오답 1위)",
-     "detail": "모의고사 오답이 가장 많은 PART를 골라 빈출 위주로 다시 읽기."
+     "title": "약점 PART 재학습",
+     "detail": "오답 최다 PART 빈출 개념 재정리"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "s",
      "parts": [
@@ -815,7 +816,7 @@ const PLAN = {
      ],
      "pages": "",
      "title": "SQL 기출 집중",
-     "detail": "DDL·JOIN·서브쿼리·GROUP BY 15문제. 결과를 표로 그려 확인."
+     "detail": "DDL · JOIN · 서브쿼리 · GROUP BY 15문항 · 결과 테이블 작성"
     }
    ],
    "plan": 90,
@@ -830,7 +831,7 @@ const PLAN = {
    "dd": "D-4",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
@@ -838,19 +839,19 @@ const PLAN = {
       "06"
      ],
      "pages": "",
-     "title": "핵심 용어 회독: 보안과 신기술",
-     "detail": "공격 기법 정의와 신기술 용어를 가리고 떠올리기."
+     "title": "핵심 용어 회독 · 보안 / 신기술",
+     "detail": "공격 기법 정의 · 신기술 용어 · 가리고 떠올리기"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "m",
      "parts": [
       "08"
      ],
      "pages": "",
-     "title": "계산식 손계산",
-     "detail": "서브넷·페이지 교체·스케줄링·디스크를 각 3문제, 시간을 재고."
+     "title": "계산식 실전 풀이",
+     "detail": "서브넷 · 페이지 교체 · 스케줄링 · 디스크 각 3문항 · 시간 측정"
     }
    ],
    "plan": 90,
@@ -865,7 +866,7 @@ const PLAN = {
    "dd": "D-3",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "t",
      "parts": [
@@ -874,17 +875,17 @@ const PLAN = {
       "04"
      ],
      "pages": "",
-     "title": "핵심 용어 회독: UML, 디자인 패턴, 테스트, 정규화, 프로토콜",
-     "detail": "빈출 용어를 정의부터 가리고 말로 설명해 보기."
+     "title": "핵심 용어 회독 · 설계 / DB / 네트워크",
+     "detail": "UML · 디자인 패턴 · 테스트 · 정규화 · 프로토콜 · 정의 설명하기"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "c",
      "parts": [],
      "pages": "",
-     "title": "코드 기출: C·Java·Python 섞어서",
-     "detail": "10문제, 문제당 5분 안에."
+     "title": "코드 실전 풀이",
+     "detail": "C · Java · Python 혼합 10문항 · 문항당 5분"
     }
    ],
    "plan": 90,
@@ -899,22 +900,22 @@ const PLAN = {
    "dd": "D-2",
    "items": [
     {
-     "slot": "점심 30분",
+     "slot": "점심 · 30분",
      "min": 30,
      "tag": "r",
      "parts": [],
      "pages": "",
      "title": "오답노트 회독",
-     "detail": "별표 문제부터 다시 봅니다."
+     "detail": "별표 문항 우선"
     },
     {
-     "slot": "퇴근 후 60분",
+     "slot": "퇴근 후 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "서술형 표기 연습과 준비물 확인",
-     "detail": "영문 약어와 풀네임 철자, 대소문자 연습. 신분증과 흑색 볼펜, 시험장 위치와 이동 시간을 큐넷 공지로 확인하고 일찍 잡니다."
+     "title": "답안 표기 연습 · 시험 준비",
+     "detail": "영문 약어 · 풀네임 철자 · 대소문자 · 신분증 · 흑색 볼펜 · 시험장 위치와 이동 시간(큐넷 공지)"
     }
    ],
    "plan": 90,
@@ -929,31 +930,31 @@ const PLAN = {
    "dd": "D-1",
    "items": [
     {
-     "slot": "1교시 60분",
+     "slot": "1교시 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
      "title": "오답노트 최종 회독",
-     "detail": "별표 두 개 문제만 봅니다."
+     "detail": "별표 두 개 문항"
     },
     {
-     "slot": "2교시 60분",
+     "slot": "2교시 · 60분",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "SQL·계산식 가볍게 복습",
-     "detail": "새 문제 없이 풀었던 문제만 손으로 다시."
+     "title": "SQL · 계산식 복습",
+     "detail": "기존 풀이 문항 재풀이 · 신규 문항 없음"
     },
     {
-     "slot": "3교시 60분 · 선택",
+     "slot": "3교시 · 60분 · 선택",
      "min": 60,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "가볍게 마무리",
-     "detail": "컨디션이 좋으면 코드 오답 몇 개만 보고, 아니면 쉬세요."
+     "title": "최종 정리 (선택)",
+     "detail": "코드 오답 일부 · 컨디션 관리"
     }
    ],
    "plan": 180,
@@ -968,22 +969,22 @@ const PLAN = {
    "dd": "D-DAY",
    "items": [
     {
-     "slot": "아침 30분",
+     "slot": "아침 · 30분",
      "min": 30,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "오답노트 별표만 훑기",
-     "detail": "새 문제는 풀지 않습니다."
+     "title": "오답노트 핵심 훑기",
+     "detail": "별표 문항만 · 신규 문항 없음"
     },
     {
-     "slot": "시험 150분",
+     "slot": "시험 · 150분",
      "min": 0,
      "tag": "r",
      "parts": [],
      "pages": "",
-     "title": "실기 시험: 45점에서 60점 이상으로",
-     "detail": "모르는 문제는 표시하고 넘어가기, 코드 문제는 여백에 변수 표 그리기, 마지막 20분은 답안 표기 검토."
+     "title": "정보처리기사 실기 시험",
+     "detail": "미해결 문항 표시 후 진행 · 코드 문항 변수 표 작성 · 종료 20분 전 답안 검토"
     }
    ],
    "plan": 30,

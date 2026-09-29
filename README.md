@@ -14,6 +14,8 @@
 - 저장 구조: `localStorage["itp-app-v2"] = { users: [...], exams: { id: { ..., state } } }`. 예전 `itp-app-v1` 기록은 처음 사용자를 만들 때 그 사용자의 정처기 시험으로 옮기고, 원본은 백업으로 남겨 둬요.
 - 비밀번호는 이 기기에서 다른 사람이 실수로 들어오지 않게 막는 잠금이에요(서버가 없어 진짜 보안은 아님). 잊으면 되찾을 수 없어요.
 
+주소: https://jimin7016-spec.github.io/ssukssuk-study/
+
 ## 파일
 index.html / app.js / plan.js(날짜별 계획 데이터) / sw.js(오프라인 캐시) / manifest.webmanifest / icon-*.png
 
@@ -39,4 +41,4 @@ index.html / app.js / plan.js(날짜별 계획 데이터) / sw.js(오프라인 �
 
 ## 주의
 - 체크·실제 시간은 기기별 localStorage 에 저장됩니다. 폰과 PC는 서로 동기화되지 않으니 "계획·성장" 화면 하단의 내보내기/가져오기로 옮기세요.
-- 계획(plan.js)이나 화면을 고쳐 다시 올리면 sw.js 맨 위 `CACHE = "itp-v5"` 숫자를 올려야 폰에 반영됩니다.
+- 계획(plan.js)이나 화면을 고쳐 다시 올리면 sw.js 맨 위 `CACHE = "itp-v6"` 숫자를 올려야 폰에 반영됩니다.
