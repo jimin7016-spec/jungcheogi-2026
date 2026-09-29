@@ -1,0 +1,16 @@
+{
+  "name": "정처기 합격 체크표",
+  "short_name": "정처기",
+  "description": "정보처리기사 실기 10월 25일 시험까지 날짜별로 체크하는 학습 플래너",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0E2233",
+  "theme_color": "#0E2233",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
