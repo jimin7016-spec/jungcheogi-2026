@@ -1,48 +1,64 @@
 (function () {
   "use strict";
 
-  var TAGS = { t: "이론", s: "SQL", m: "계산식", c: "코드", r: "복습·기출" };
+  // 과목 태그 이름은 시험 종류마다 다르게 (키 t/s/m/c/r 은 공통)
+  var TAG_SETS = {
+    itp: { t: "이론", s: "SQL", m: "계산식", c: "코드", r: "복습·기출" },
+    aws: { t: "컴퓨팅", s: "스토리지·DB", m: "네트워킹", c: "보안·IAM", r: "모의고사·복습" },
+    custom: { t: "이론", s: "실습", m: "문제풀이", c: "암기", r: "복습" }
+  };
+  var EXAM_KINDS = {
+    itp: { name: "정보처리기사 실기", date: "2026-10-25" },
+    aws: { name: "AWS SAA-C03", date: "" },
+    custom: { name: "", date: "" }
+  };
+  var TAGS = TAG_SETS.itp;
   var TAG_ORDER = ["t", "s", "m", "c", "r"];
   var WD = ["일", "월", "화", "수", "목", "금", "토"];
-  var EXAM_ISO = "2026-10-25";
+  var ITP_DATE = "2026-10-25";
+  var EXAM_ISO = ITP_DATE;
   var EXAM_UTC = Date.UTC(2026, 9, 25);
-  var LS_KEY = "itp-app-v1";
+  var STORE_KEY = "itp-app-v2";   // { users: [...], exams: { id: {...} } }
+  var OLD_KEY = "itp-app-v1";     // 예전 단일 사용자 정처기 기록. 옮긴 뒤에도 백업으로 남겨 둔다.
+  var SESSION_KEY = "itp-session";
 
-  // 실제 공부시간(분)이 쌓일수록 자라는 캐릭터 단계. 전체 계획이 약 47시간이라 40시간에 마지막 단계.
-  var STAGES = [
-    { min: 0, name: "말랑 알", line: "쿨쿨… 공부하면 깨어나요" },
-    { min: 120, name: "금 간 알", line: "톡톡! 안에서 꿈틀거려요" },
-    { min: 360, name: "갓 부화 삐약이", line: "껍질 모자 쓰고 세상 구경 중" },
-    { min: 840, name: "아기 병아리", line: "두 발로 씩씩하게 섰어요" },
-    { min: 1560, name: "중병아리", line: "연필 들고 열공 모드 돌입" },
-    { min: 2400, name: "늠름한 합격 닭", line: "머리띠 질끈! 시험장 갈 준비 완료" }
-  ];
-  var CHEERS = [
-    "오늘도 삐약! 10분만 해도 한 발 앞이야",
-    "틀린 문제는 점수로 바뀌는 중이야 삐약",
-    "60점만 넘기면 돼. 할 수 있어!",
-    "SQL은 손으로 써봐야 내 거가 돼",
-    "물 한 잔 마시고 다시 가보자 삐약",
-    "코드 문제는 변수 표 그리기!",
-    "네가 공부하면 나도 쑥쑥 커!",
-    "짧게라도 좋아, 끊기지만 않으면 돼"
-  ];
-  var DONE_CHEERS = ["오늘도 삐약!", "잘했어 삐약!", "한 칸 클리어!", "쑥쑥 크는 중!", "최고야 삐약!"];
+  // 캐릭터 3종. 단계 이름·대사는 캐릭터별, 성장 기준 시간은 시험 계획 총량의 비율(STAGE_FRAC).
+  var CHARS = {
+    chick: {
+      name: "병아리", sound: "삐약",
+      stages: ["말랑 알", "금 간 알", "갓 부화 삐약이", "아기 병아리", "중병아리", "늠름한 합격 닭"],
+      lines: ["쿨쿨… 공부하면 깨어나요", "톡톡! 안에서 꿈틀거려요", "껍질 모자 쓰고 세상 구경 중", "두 발로 씩씩하게 섰어요", "연필 들고 열공 모드 돌입", "머리띠 질끈! 시험장 갈 준비 완료"]
+    },
+    monkey: {
+      name: "아기 원숭이", sound: "끼끼",
+      stages: ["바나나 알", "금 간 알", "갓 부화 꼬마 몽이", "아기 원숭이", "개구쟁이 원숭이", "합격 원숭이 대장"],
+      lines: ["쿨쿨… 공부하면 깨어나요", "톡톡! 안에서 꼬리가 살랑", "껍질 모자 쓰고 두리번두리번", "동그란 귀 쫑긋! 씩씩하게 섰어요", "연필 들고 열공 모드 돌입", "머리띠 질끈! 합격 바나나 먹으러 가자"]
+    },
+    bear: {
+      name: "핑크곰", sound: "곰곰",
+      stages: ["딸기 알", "금 간 알", "갓 부화 아기곰", "꼬마 핑크곰", "씩씩한 핑크곰", "합격 핑크곰"],
+      lines: ["쿨쿨… 공부하면 깨어나요", "톡톡! 안에서 꼼지락꼼지락", "껍질 모자 쓰고 꾸벅 인사", "말랑한 발로 아장아장", "연필 들고 열공 모드 돌입", "머리띠 질끈! 시험장 갈 준비 완료"]
+    }
+  };
+  var CHAR_ORDER = ["chick", "monkey", "bear"];
+  var STAGE_FRAC = [0, 0.043, 0.128, 0.3, 0.55, 0.85];
+  var STAGES = [];
+  var CHEERS = [], DONE_CHEERS = [];
 
   var $screen = document.getElementById("screen");
   var $sheetRoot = document.getElementById("sheet-root");
   var $toast = document.getElementById("toast");
+  var $tabs = document.querySelector(".tabs");
+  var store = { users: [], exams: {} };
+  var USER = null, EXAM = null, CHAR = "chick";
   var state = emptyState();
-  var dayBy = {}, phaseBy = {}, DAYS = [];
+  var dayBy = {}, phaseBy = {}, DAYS = [], PHASES = [], PARTS = [];
   var ui = {};
   var route = "today";
   var TODAY, sel;
   var cheerIdx = 0, bubbleTimer = 0, toastTimer = 0, sheetClose = null;
 
-  PLAN.phases.forEach(function (p) { phaseBy[p.key] = p; });
   PLAN.days.forEach(function (d) {
-    dayBy[d.iso] = d;
-    DAYS.push(d.iso);
     d.items.forEach(function (it, i) { it.id = d.iso + "-" + i; });
   });
 
@@ -67,7 +83,10 @@
     next: svgIcon('<path d="M9 5l7 7-7 7"/>', 2.8),
     x: svgIcon('<path d="M6 6l12 12M18 6L6 18"/>', 2.6),
     check: svgIcon('<path d="M5 12.5l4.5 4.5L19 7.5"/>', 3.4),
-    plus: svgIcon('<path d="M12 5v14M5 12h14"/>', 2.8)
+    plus: svgIcon('<path d="M12 5v14M5 12h14"/>', 2.8),
+    down: svgIcon('<path d="M7 10l5 5 5-5"/>', 2.6),
+    back: svgIcon('<path d="M15 5l-7 7 7 7"/>', 2.8),
+    del: svgIcon('<path d="M20 7H9l-5 5 5 5h11z"/><path d="M13 10l4 4M17 10l-4 4"/>', 2)
   };
   function pad(n) { return String(n).padStart(2, "0"); }
   function obj(o) { return o && typeof o === "object" && !Array.isArray(o) ? o : {}; }
@@ -150,14 +169,117 @@
       lv: typeof src.lv === "number" ? src.lv : 0
     };
   }
-  function load() {
+  function loadStore() {
     try {
-      var o = JSON.parse(localStorage.getItem(LS_KEY) || "null");
-      if (o) state = normalize(o);
+      var o = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (o && Array.isArray(o.users)) store = { users: o.users, exams: obj(o.exams) };
     } catch (e) {}
   }
+  function loadOld() {
+    try { return JSON.parse(localStorage.getItem(OLD_KEY) || "null"); } catch (e) { return null; }
+  }
   function save() {
-    try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+    if (EXAM) EXAM.state = state;
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(store)); } catch (e) {}
+  }
+
+  /* ---------- users & exams ---------- */
+  function newId(p) { return p + Date.now().toString(36) + Math.floor(Math.random() * 1e6).toString(36); }
+  // 4자리 비밀번호는 이 기기 안에서 사용자를 나누는 '잠금 화면'용. 원문 대신 해시만 저장한다.
+  function hashPin(id, pin) {
+    var h = 0x811c9dc5, s = "itp:" + id + ":" + pin;
+    for (var i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    return h.toString(16);
+  }
+  function isoAdd(iso, n) {
+    var p = isoParts(iso), d = new Date(Date.UTC(p[0], p[1] - 1, p[2] + n));
+    return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate());
+  }
+  function isoDiff(a, b) {
+    var x = isoParts(a), y = isoParts(b);
+    return Math.round((Date.UTC(y[0], y[1] - 1, y[2]) - Date.UTC(x[0], x[1] - 1, x[2])) / 864e5);
+  }
+  function mdShort(iso) { var p = isoParts(iso); return p[1] + "/" + p[2]; }
+  function isWeekend(iso) { var w = wdOf(iso); return w === "토" || w === "일"; }
+  function realToday() {
+    var o = new URLSearchParams(location.search).get("today");
+    if (o && /^\d{4}-\d{2}-\d{2}$/.test(o)) return o;
+    var n = new Date();
+    return n.getFullYear() + "-" + pad(n.getMonth() + 1) + "-" + pad(n.getDate());
+  }
+  function userById(id) { return store.users.filter(function (u) { return u.id === id; })[0] || null; }
+  function examsOf(u) { return (u.exams || []).map(function (id) { return store.exams[id]; }).filter(Boolean); }
+  function ddOf(exam) {
+    var n = isoDiff(realToday(), exam.date);
+    return n > 0 ? "D-" + n : n === 0 ? "D-DAY" : "끝";
+  }
+
+  // 기본 계획이 없는 시험: 시작일~시험일 날짜를 만들고, fill 이면 공부 가능 시간만큼 '내용 정하기' 칸을 넣는다
+  function skeletonDays(start, end, wk, we, fill) {
+    var out = [];
+    for (var iso = start; iso <= end; iso = isoAdd(iso, 1)) {
+      var min = iso === end ? 0 : isWeekend(iso) ? we : wk;
+      var items = [];
+      if (fill && min > 0) {
+        items.push({ slot: isWeekend(iso) ? "주말" : "평일", min: min, tag: "t", parts: [], pages: "", title: "공부할 내용 정하기", detail: "'계획 수정'을 눌러 이 날 할 일을 적어 주세요." });
+      }
+      out.push({ iso: iso, items: items });
+    }
+    return out;
+  }
+  function planTotal(days) {
+    var t = 0;
+    days.forEach(function (d) { d.items.forEach(function (it) { t += it.min; }); });
+    return t;
+  }
+
+  function openExam(exam) {
+    EXAM = exam;
+    CHAR = CHARS[USER.char] ? USER.char : "chick";
+    TAGS = TAG_SETS[exam.kind] || TAG_SETS.custom;
+    EXAM_ISO = exam.date;
+    var ep = isoParts(exam.date);
+    EXAM_UTC = Date.UTC(ep[0], ep[1] - 1, ep[2]);
+    dayBy = {}; phaseBy = {}; DAYS = []; PHASES = []; PARTS = [];
+    if (exam.base === "itp") {
+      PHASES = PLAN.phases; PARTS = PLAN.parts;
+      PLAN.days.forEach(function (d) { dayBy[d.iso] = d; DAYS.push(d.iso); });
+    } else {
+      var days = Array.isArray(exam.days) ? exam.days : [];
+      var first = days.length ? days[0].iso : exam.date;
+      days.forEach(function (d) {
+        var key = "w" + Math.floor(isoDiff(first, d.iso) / 7);
+        if (!phaseBy[key]) {
+          phaseBy[key] = { key: key, name: (PHASES.length + 1) + "주차", first: d.iso, last: d.iso, desc: "" };
+          PHASES.push(phaseBy[key]);
+        }
+        phaseBy[key].last = d.iso;
+        d.items.forEach(function (it, i) { it.id = d.iso + "-" + i; });
+        dayBy[d.iso] = { iso: d.iso, phase: key, hol: d.iso === exam.date ? "시험일" : "", wd: wdOf(d.iso), md: mdShort(d.iso), items: d.items };
+        DAYS.push(d.iso);
+      });
+      PHASES.forEach(function (p) { p.range = mdShort(p.first) + " ~ " + mdShort(p.last); });
+    }
+    PHASES.forEach(function (p) { phaseBy[p.key] = p; });
+    TODAY = todayInfo();
+    state = normalize(exam.state);
+    // 성장 기준은 처음 정한 계획 총량으로 고정 (계획을 고쳐도 단계가 흔들리지 않게)
+    if (!exam.goalMin) exam.goalMin = Math.max(600, DAYS.reduce(function (n, iso) {
+      return n + dayBy[iso].items.reduce(function (m, it) { return m + it.min; }, 0);
+    }, 0));
+    var c = CHARS[CHAR], s = c.sound;
+    STAGES = STAGE_FRAC.map(function (f, i) {
+      return { min: Math.round((exam.goalMin * f) / 10) * 10, name: c.stages[i], line: c.lines[i] };
+    });
+    CHEERS = ["오늘도 " + s + "! 10분만 해도 한 발 앞이야", "틀린 문제는 점수로 바뀌는 중이야 " + s, "물 한 잔 마시고 다시 가보자 " + s,
+      "네가 공부하면 나도 쑥쑥 커!", "짧게라도 좋아, 끊기지만 않으면 돼", "오늘 한 칸이 시험날 한 문제야"];
+    if (exam.kind === "itp") CHEERS.push("SQL은 손으로 써봐야 내 거가 돼", "코드 문제는 변수 표 그리기!", "60점만 넘기면 돼. 할 수 있어!");
+    if (exam.kind === "aws") CHEERS.push("서비스 이름보다 쓰임새로 외우자", "'가장 비용 효율적인'이 나오면 한 번 더 읽기!", "720점만 넘기면 합격! 할 수 있어");
+    DONE_CHEERS = ["오늘도 " + s + "!", "잘했어 " + s + "!", "한 칸 클리어!", "쑥쑥 크는 중!", "최고야 " + s + "!"];
+    state.lv = stageOf(totals().act);
+    sel = defaultSel();
+    USER.lastExam = exam.id;
+    save();
   }
 
   function itemsOf(iso) { return Array.isArray(state.plan[iso]) ? state.plan[iso] : dayBy[iso].items; }
@@ -290,6 +412,80 @@
     s += '<path d="M14 26l2.5 5 5 2.5-5 2.5-2.5 5-2.5-5-5-2.5 5-2.5zM106 26l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#FFC43D"/>';
     return s + '</svg>';
   }
+
+  // 오리지널 아기 원숭이·핑크곰. 알 단계(0·1)는 병아리 알에 점 색만 바꿔 쓰고, 2단계부터 동물 머리·몸을 그린다.
+  var FUR = {
+    monkey: { fur: "#B57C49", dark: "#8A5A30", face: "#F8DEBB", spot: "#EBCB9F" },
+    bear: { fur: "#FFB5C8", dark: "#F48AA8", face: "#FFE7EF", spot: "#FFD0DD" }
+  };
+  function r1(n) { return Math.round(n * 10) / 10; }
+  function circ(cx, cy, r, fill) { return '<circle cx="' + r1(cx) + '" cy="' + r1(cy) + '" r="' + r1(r) + '" fill="' + fill + '"/>'; }
+  function ell(cx, cy, rx, ry, fill, rot) {
+    return '<ellipse cx="' + r1(cx) + '" cy="' + r1(cy) + '" rx="' + r1(rx) + '" ry="' + r1(ry) + '" fill="' + fill + '"' + (rot ? ' transform="rotate(' + rot + " " + r1(cx) + " " + r1(cy) + ')"' : "") + "/>";
+  }
+  function faceParts(cx, ey, dx, er, cy, cdx) {
+    return '<g class="eyes">' + ell(cx - dx, ey, er, er + 0.6, INK) + ell(cx + dx, ey, er, er + 0.6, INK) +
+      circ(cx - dx + 1.4, ey - 1.7, 1.5, "#fff") + circ(cx + dx + 1.4, ey - 1.7, 1.5, "#fff") + "</g>" +
+      ell(cx - cdx, cy, 5, 3.1, "rgba(255,140,140,.55)") + ell(cx + cdx, cy, 5, 3.1, "rgba(255,140,140,.55)");
+  }
+  function animalHead(kind, cx, cy, r) {
+    var f = FUR[kind], s = "";
+    if (kind === "monkey") {
+      s += circ(cx - r * 0.98, cy + r * 0.05, r * 0.36, f.fur) + circ(cx + r * 0.98, cy + r * 0.05, r * 0.36, f.fur);
+      s += circ(cx - r * 0.98, cy + r * 0.05, r * 0.21, f.face) + circ(cx + r * 0.98, cy + r * 0.05, r * 0.21, f.face);
+      s += circ(cx, cy, r, f.fur);
+      s += '<path d="M' + r1(cx - 6) + " " + r1(cy - r + 3) + "q2-9 6-2q3-8 6 2" + '" fill="none" stroke="' + f.fur + '" stroke-width="4" stroke-linecap="round"/>';
+      s += circ(cx - r * 0.3, cy - r * 0.08, r * 0.4, f.face) + circ(cx + r * 0.3, cy - r * 0.08, r * 0.4, f.face) + ell(cx, cy + r * 0.3, r * 0.62, r * 0.46, f.face);
+      s += faceParts(cx, cy - r * 0.08, r * 0.3, 3.9, cy + r * 0.3, r * 0.58);
+      s += circ(cx - 2.2, cy + r * 0.2, 1.3, f.dark) + circ(cx + 2.2, cy + r * 0.2, 1.3, f.dark);
+      s += '<path d="M' + r1(cx - 5) + " " + r1(cy + r * 0.38) + "q5 4.5 10 0" + '" stroke="' + INK + '" stroke-width="2" fill="none" stroke-linecap="round"/>';
+    } else {
+      s += circ(cx - r * 0.72, cy - r * 0.72, r * 0.34, f.fur) + circ(cx + r * 0.72, cy - r * 0.72, r * 0.34, f.fur);
+      s += circ(cx - r * 0.72, cy - r * 0.72, r * 0.19, f.dark) + circ(cx + r * 0.72, cy - r * 0.72, r * 0.19, f.dark);
+      s += circ(cx, cy, r, f.fur);
+      s += ell(cx, cy + r * 0.32, r * 0.4, r * 0.29, f.face);
+      s += faceParts(cx, cy - r * 0.06, r * 0.36, 4, cy + r * 0.22, r * 0.64);
+      s += ell(cx, cy + r * 0.2, r * 0.13, r * 0.09, "#7A4050");
+      s += '<path d="M' + r1(cx - 4) + " " + r1(cy + r * 0.36) + "q2 2.5 4 0q2 2.5 4 0" + '" stroke="#7A4050" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+    }
+    return s;
+  }
+  function animalSVG(kind, st) {
+    var f = FUR[kind];
+    if (st <= 1) return chickSVG(st).split("#FCEFC8").join(f.spot);
+    var s = '<svg viewBox="0 0 120 120" aria-hidden="true"><ellipse cx="60" cy="111" rx="28" ry="4.5" fill="rgba(74,59,50,.13)"/><g class="body">';
+    if (st === 2) {
+      s += animalHead(kind, 60, 60, 25);
+      s += '<path d="M28 80l8-8 8 8 8-8 8 8 8-8 8 8 8-8 8 8c1 19-13 30-32 30s-33-11-32-30z" fill="#FFFDF4" stroke="#EED9A4" stroke-width="2.5" stroke-linejoin="round"/>';
+      s += ell(45, 97, 5, 3.5, f.spot) + ell(77, 93, 4, 3, f.spot);
+      s += '<path d="M44 38q16-22 32 0l-5.3 4-5.3-4-5.4 4-5.3-4-5.4 4z" fill="#FFFDF4" stroke="#EED9A4" stroke-width="2.5" stroke-linejoin="round" transform="rotate(-14 60 32)"/>';
+      return s + "</g></svg>";
+    }
+    var big = st >= 4, hy = big ? 55 : 60, hr = big ? 27 : 25;
+    var by = big ? 93 : 94, brx = big ? 23 : 20, bry = big ? 17 : 15;
+    if (kind === "monkey") s += '<path d="M' + (60 + brx - 4) + " " + (by + 4) + 'q20 4 17-13q-2-9-9-5q-5 4 1 7" fill="none" stroke="' + f.fur + '" stroke-width="5" stroke-linecap="round"/>';
+    else s += circ(60 + brx - 2, by + 6, 4.5, f.fur);
+    s += ell(50, 108, 7, 4, f.dark) + ell(70, 108, 7, 4, f.dark);
+    s += ell(60, by, brx, bry, f.fur) + ell(60, by + 3, brx * 0.58, bry * 0.62, f.face);
+    s += ell(60 - brx + 1, by - 2, 5.5, 9, f.fur, 25);
+    var front = "";
+    if (st === 4) {
+      front = '<g transform="rotate(-25 98 76)"><rect x="94" y="48" width="8" height="28" rx="2" fill="#7ED9A6"/><path d="M94 76h8l-4 8z" fill="#FFE0B0"/><path d="M97 81.5h2l-1 2.5z" fill="' + INK + '"/><rect x="94" y="44" width="8" height="5" rx="1.5" fill="#FF9FB0"/></g>' + ell(88, 84, 5.5, 10, f.fur, -40);
+    } else {
+      s += ell(60 + brx - 1, by - 2, 5.5, 9, f.fur, -25);
+    }
+    s += animalHead(kind, 60, hy, hr) + front;
+    if (st === 5) {
+      s += '<path d="M34 ' + (hy - 15) + "q26-9 52 0v7q-26-9-52 0z" + '" fill="#fff"/>' + circ(60, hy - 16.5, 3.4, "#FF6B6B");
+      s += '<path d="M35 ' + (hy - 12) + "q-10 0-14 6M35 " + (hy - 9) + 'q-8 4-10 11" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>';
+      s += circ(60, by + 1, 6, "#FFD23F") + '<path d="M56 ' + (by - 6) + "l4 5 4-5" + '" stroke="#FF6B6B" stroke-width="3" fill="none"/>';
+      s += '</g><path d="M14 26l2.5 5 5 2.5-5 2.5-2.5 5-2.5-5-5-2.5 5-2.5zM106 26l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#FFC43D"/></svg>';
+      return s;
+    }
+    return s + "</g></svg>";
+  }
+  function charSVG(kind, st) { return kind === "monkey" || kind === "bear" ? animalSVG(kind, st) : chickSVG(st); }
+
   function celebrate() {
     var host = ui.pet;
     if (!host || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
@@ -325,7 +521,7 @@
   function setChar(node, st) {
     if (!node || node.dataset.st === String(st)) return;
     node.dataset.st = String(st);
-    node.innerHTML = chickSVG(st);
+    node.innerHTML = charSVG(CHAR, st);
   }
   function hop() {
     var c = ui.char;
@@ -401,19 +597,28 @@
   }
   var ICON_FLAME = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4 5 4.9 8.6A6.2 6.2 0 0 1 12 21.5 6.2 6.2 0 0 1 6 14c0-2.6 1.6-4 2.6-5.2.3 1.6 1 2.6 2.1 3.1C10.4 8.4 10.9 5 12 2.5z" fill="#FF9F45"/><path d="M12 12.5c1.9 1.6 2.8 3 2.8 4.6A2.8 2.8 0 0 1 12 20a2.8 2.8 0 0 1-2.8-2.9c0-1.6 1.2-3 2.8-4.6z" fill="#FFD23F"/></svg>';
   var ICON_CLOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#BFE6FF"/><path d="M12 7v5l3 2" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
-  var ICON_BRAND = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M18 9q1-6 3.5-2q2-5 4 1" fill="none" stroke="#F5C020" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="22" r="14" fill="#FFD23F"/><circle cx="15.5" cy="20" r="2" fill="#4A3B32"/><circle cx="24.5" cy="20" r="2" fill="#4A3B32"/><path d="M17 24.5q3-2 6 0q-3 3.5-6 0z" fill="#FF9F45"/><ellipse cx="11" cy="25" rx="2.6" ry="1.6" fill="#FFA99A"/><ellipse cx="29" cy="25" rx="2.6" ry="1.6" fill="#FFA99A"/></svg>';
   var ICON_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7ED9A6"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#1F6B45" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICON_PACE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#FFD23F"/><path d="M7 16l3.5-4 3 2.5L17 9" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICON_PENCIL ='<svg viewBox="0 0 80 80" aria-hidden="true"><g transform="rotate(-38 40 40)"><rect x="30" y="4" width="20" height="54" rx="4" fill="#FFF3C9"/><rect x="30" y="4" width="20" height="10" rx="4" fill="#FF9FB0"/><path d="M30 58h20l-10 18z" fill="#FFE0B0"/><path d="M36.5 70h7l-3.5 6z" fill="#4A3B32"/></g></svg>';
 
-  function topbar(title) {
+  // 누구의 어떤 시험인지 보여주고, 누르면 시험 고르기(다른 시험·사용자 바꾸기) 화면으로
+  function topbar() {
     var t = el("div", "topbar");
-    var b = el("div", "brand");
-    b.innerHTML = ICON_BRAND;
-    b.append(document.createTextNode(title));
+    var b = btn("brand", null, "시험 바꾸기 또는 사용자 바꾸기");
+    var av = el("span", "avatar");
+    av.innerHTML = charSVG(CHAR, 3);
+    var txt = el("span", "who");
+    txt.append(el("b", null, USER.name), el("small", null, EXAM.name));
+    b.append(av, txt);
+    b.insertAdjacentHTML("beforeend", IC.down);
+    b.addEventListener("click", function () { location.hash = "#exams"; });
     ui.lvChip = el("span", "lv-chip");
     t.append(b, ui.lvChip);
     return t;
+  }
+  function examDateLabel(iso) {
+    var p = isoParts(iso);
+    return p[0] + ". " + p[1] + ". " + p[2] + " (" + wdOf(iso) + ")";
   }
   function miniCard(cls, icon, label, key) {
     var c = el("div", "card b-mini" + (cls ? " " + cls : ""));
@@ -431,7 +636,7 @@
     var deco = el("div", "deco");
     deco.innerHTML = ICON_PENCIL;
     ui.ddn = el("div", "big");
-    dd.append(el("small", null, "정보처리기사 실기까지"), ui.ddn, el("div", "date", "2026. 10. 25 (일)"), deco);
+    dd.append(el("small", null, EXAM.name + "까지"), ui.ddn, el("div", "date", examDateLabel(EXAM_ISO)), deco);
     ui.streakCard = miniCard("b-streak", ICON_FLAME, "연속 공부", "stk");
     g.append(dd, ui.streakCard, miniCard("", ICON_CLOCK, timeLabel, "tm"));
     return g;
@@ -442,7 +647,7 @@
     ui.pet = p;
     ui.bubble = el("div", "bubble");
     ui.bubble.setAttribute("aria-live", "polite");
-    ui.char = btn("char", null, "병아리 쓰다듬고 응원 듣기");
+    ui.char = btn("char", null, CHARS[CHAR].name + " 쓰다듬고 응원 듣기");
     ui.char.addEventListener("click", function () {
       hop();
       say(CHEERS[cheerIdx++ % CHEERS.length]);
@@ -480,7 +685,7 @@
     expUpdate(ui.expFill, ui.expTxt, t.act, st);
     var sk = streakInfo();
     bigNum(ui.stk, sk.cur, "일");
-    ui.stkSub.textContent = sk.today ? "오늘도 삐약! 최고 " + sk.best + "일" : sk.cur ? "오늘 하면 " + (sk.cur + 1) + "일째!" : "오늘부터 시작!";
+    ui.stkSub.textContent = sk.today ? "오늘도 " + CHARS[CHAR].sound + "! 최고 " + sk.best + "일" : sk.cur ? "오늘 하면 " + (sk.cur + 1) + "일째!" : "오늘부터 시작!";
     ui.streakCard.classList.toggle("on", sk.today);
     return st;
   }
@@ -503,7 +708,7 @@
     ui.body = el("div", "day-body");
 
     $screen.textContent = "";
-    $screen.append(topbar("삐약 플래너"), bentoTop("오늘 공부"), petCard(false), nav, ui.back, ui.body);
+    $screen.append(topbar(), bentoTop("오늘 공부"), petCard(false), nav, ui.back, ui.body);
     fillDay();
     updateToday();
   }
@@ -945,7 +1150,7 @@
     ui.cells = {}; ui.rows = {}; ui.dex = [];
     var b4 = el("section", "bento4");
     b4.append(miniCard("", ICON_CHECK, "완료한 계획", "stDone"), miniCard("", ICON_PACE, "계획 대비", "stPace"));
-    var head = [topbar("계획·성장"), bentoTop("총 공부"), petCard(true), b4];
+    var head = [topbar(), bentoTop("총 공부"), petCard(true), b4];
 
     var body = el("div", "body2");
 
@@ -955,9 +1160,9 @@
     STAGES.forEach(function (st, i) {
       var t = el("div", "dex-tile");
       var art = el("div");
-      art.innerHTML = chickSVG(i);
+      art.innerHTML = charSVG(CHAR, i);
       var name = el("b");
-      t.append(art, name, el("small", null, st.min ? st.min / 60 + "시간" : "시작"));
+      t.append(art, name, el("small", null, st.min ? fmtMin(st.min) : "시작"));
       grid.append(t);
       ui.dex.push({ tile: t, name: name });
     });
@@ -972,7 +1177,10 @@
     var wdh = el("div", "cal-wd");
     ["월", "화", "수", "목", "금", "토", "일"].forEach(function (w) { wdh.append(el("span", null, w)); });
     var cal = el("div", "cal");
-    var start = Date.UTC(2026, 8, 28), end = Date.UTC(2026, 10, 1);
+    var fp = isoParts(DAYS[0]), lp = isoParts(DAYS[DAYS.length - 1]);
+    var start = Date.UTC(fp[0], fp[1] - 1, fp[2]), end = Date.UTC(lp[0], lp[1] - 1, lp[2]);
+    start -= ((new Date(start).getUTCDay() + 6) % 7) * 864e5;
+    end += ((7 - new Date(end).getUTCDay()) % 7) * 864e5;
     for (var t = start; t <= end; t += 864e5) {
       var dt = new Date(t);
       var iso = dt.getUTCFullYear() + "-" + pad(dt.getUTCMonth() + 1) + "-" + pad(dt.getUTCDate());
@@ -998,11 +1206,12 @@
 
     // 전체 계획
     var pc = card("전체 공부 계획", "눌러서 보기·수정");
-    PLAN.phases.forEach(function (p, pi) {
+    PHASES.forEach(function (p, pi) {
       var ph = el("div", "phase");
       var t2 = el("div", "phase-t");
       t2.append(el("span", "num", String(pi + 1)), el("b", null, p.name), el("span", "r", p.range));
-      ph.append(t2, el("p", "phase-d", p.desc));
+      ph.append(t2);
+      if (p.desc) ph.append(el("p", "phase-d", p.desc));
       DAYS.filter(function (iso) { return dayBy[iso].phase === p.key; }).forEach(function (iso) {
         var r = btn("lrow");
         var dc = el("span", "d", dayBy[iso].md);
@@ -1035,7 +1244,7 @@
     var pt = card("교재 PART별 진도", "완료한 블록 / 전체");
     var pg = el("div", "parts");
     ui.pbar = {}; ui.pn = {};
-    PLAN.parts.forEach(function (p) {
+    PARTS.forEach(function (p) {
       var c = el("div", "part");
       var mini = el("div", "mini"), bar = el("i");
       mini.append(bar);
@@ -1045,7 +1254,7 @@
       pg.append(c);
     });
     pt.append(pg);
-    body.append(pt);
+    if (PARTS.length) body.append(pt);
 
     // 백업
     var bk = card("기록 백업", "이 기기에만 저장돼요");
@@ -1139,7 +1348,7 @@
     });
     ui.resetAll.hidden = !anyEdited;
 
-    PLAN.parts.forEach(function (p) {
+    PARTS.forEach(function (p) {
       var tt = t.partTotal[p.k] || 0, dn = t.partDone[p.k] || 0;
       ui.pbar[p.k].style.width = (tt ? Math.round((dn / tt) * 100) : 0) + "%";
       ui.pn[p.k].textContent = dn + " / " + tt + " 블록";
@@ -1214,25 +1423,488 @@
   }
 
   /* ---------- routing ---------- */
+  /* ---------- 사용자 · 시험 화면 ---------- */
+  var keyHandler = null;
+  function setKeys(fn) {
+    if (keyHandler) document.removeEventListener("keydown", keyHandler);
+    keyHandler = fn;
+    if (fn) document.addEventListener("keydown", fn);
+  }
+  function sessionUser() { try { return sessionStorage.getItem(SESSION_KEY); } catch (e) { return null; } }
+  function setSession(id) {
+    try { if (id) sessionStorage.setItem(SESSION_KEY, id); else sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+  }
+  function go(h) { if (location.hash === "#" + h) render(); else location.hash = "#" + h; }
+  function hasOldData() {
+    var o = loadOld();
+    return !!(o && typeof o === "object" && (Object.keys(obj(o.done)).length || Object.keys(obj(o.act)).length || Object.keys(obj(o.extra)).length || Object.keys(obj(o.memo)).length || Object.keys(obj(o.plan)).length));
+  }
+  // 시험별 공부 총량(분)과 캐릭터 단계: 시험을 열지 않고 목록에서 보여줄 때 쓴다
+  function examAct(ex) {
+    var st = obj(ex.state), t = 0;
+    Object.keys(obj(st.act)).forEach(function (k) { if (typeof st.act[k] === "number") t += st.act[k]; });
+    Object.keys(obj(st.extra)).forEach(function (k) {
+      (Array.isArray(st.extra[k]) ? st.extra[k] : []).forEach(function (x) { t += Number(x.min) || 0; });
+    });
+    return t;
+  }
+  function examStage(ex) {
+    var goal = ex.goalMin || 2820, a = examAct(ex), s = 0;
+    STAGE_FRAC.forEach(function (f, i) { if (a >= Math.round((goal * f) / 10) * 10) s = i; });
+    return s;
+  }
+  function avatar(kind, st, cls) {
+    var a = el("span", "avatar" + (cls ? " " + cls : ""));
+    a.innerHTML = charSVG(kind, st == null ? 3 : st);
+    return a;
+  }
+  function screenHead(title, sub, backTo) {
+    var h = el("header", "screen-h");
+    if (backTo) {
+      var b = btn("nav-btn", null, "뒤로");
+      b.innerHTML = IC.back;
+      b.addEventListener("click", function () { go(backTo); });
+      h.append(b);
+    }
+    var t = el("div", "sh-txt");
+    t.append(el("h1", null, title));
+    if (sub) t.append(el("p", null, sub));
+    h.append(t);
+    return h;
+  }
+
+  function usersScreen() {
+    $screen.textContent = "";
+    $screen.append(screenHead("누가 공부하나요?", "이름을 누르고 비밀번호 4자리를 입력해요"));
+    var grid = el("section", "user-grid");
+    store.users.forEach(function (u) {
+      var c = btn("ucard");
+      var ex = examsOf(u);
+      var best = ex.reduce(function (m, e) { return Math.max(m, examStage(e)); }, 0);
+      c.append(avatar(u.char, Math.max(best, 2), "lg"), el("b", null, u.name), el("small", null, ex.length ? ex.map(function (e) { return e.name; }).join(" · ") : "시험 없음"));
+      c.addEventListener("click", function () { go("lock/" + u.id); });
+      grid.append(c);
+    });
+    var add = btn("ucard add");
+    add.innerHTML = '<span class="plus">' + IC.plus + "</span>";
+    add.append(el("b", null, "새 사용자"), el("small", null, "이름·시험·캐릭터 정하기"));
+    add.addEventListener("click", function () { go("new"); });
+    grid.append(add);
+    $screen.append(grid, el("p", "note center", "기록은 이 기기에만 저장돼요. 비밀번호는 다른 사람이 실수로 들어오지 않게 막는 잠금이에요."));
+  }
+
+  function pinScreen(u) {
+    var pin = "";
+    $screen.textContent = "";
+    var wrap = el("section", "pin-wrap");
+    var head = screenHead(u.name + "님", "비밀번호 4자리를 눌러 주세요", "users");
+    var dots = el("div", "pin-dots");
+    dots.setAttribute("aria-hidden", "true");
+    for (var i = 0; i < 4; i++) dots.append(el("i"));
+    var msg = el("p", "pin-msg");
+    msg.setAttribute("aria-live", "polite");
+    var pad4 = el("div", "keypad");
+    function paint() { [].forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k < pin.length); }); }
+    function press(k) {
+      if (k === "del") { pin = pin.slice(0, -1); paint(); return; }
+      if (pin.length >= 4) return;
+      pin += k; paint(); buzz();
+      if (pin.length < 4) return;
+      if (hashPin(u.id, pin) === u.pin) {
+        setSession(u.id);
+        setKeys(null);
+        var ex = examsOf(u);
+        go(!ex.length ? "add-exam" : ex.length > 1 ? "exams" : "today");
+      } else {
+        msg.textContent = "비밀번호가 달라요. 다시 눌러 주세요.";
+        wrap.classList.remove("shake"); void wrap.offsetWidth; wrap.classList.add("shake");
+        setTimeout(function () { pin = ""; paint(); }, 250);
+      }
+    }
+    ["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"].forEach(function (k) {
+      if (!k) { pad4.append(el("span")); return; }
+      var b = btn("key", k === "del" ? null : k, k === "del" ? "지우기" : k);
+      if (k === "del") b.innerHTML = IC.del;
+      b.addEventListener("click", function () { press(k); });
+      pad4.append(b);
+    });
+    setKeys(function (e) {
+      if (/^\d$/.test(e.key)) press(e.key);
+      else if (e.key === "Backspace") press("del");
+    });
+    wrap.append(avatar(u.char, 3, "xl"), dots, msg, pad4);
+    $screen.append(head, wrap);
+  }
+
+  function examsScreen() {
+    var u = USER;
+    $screen.textContent = "";
+    $screen.append(screenHead(u.name + "님, 어떤 공부 할까요?", "시험을 누르면 그 시험의 계획과 캐릭터로 들어가요"));
+    var list = el("section", "exam-list");
+    examsOf(u).forEach(function (ex) {
+      var row = el("div", "exam-card");
+      var main = btn("exam-main");
+      var info = el("span", "exam-info");
+      info.append(el("b", null, ex.name), el("small", null, examDateLabel(ex.date) + " · 공부 " + fmtMin(examAct(ex))));
+      main.append(avatar(u.char, examStage(ex)), info, el("span", "dd-pill", ddOf(ex)));
+      main.addEventListener("click", function () { openExam(ex); go("today"); });
+      var del = btn("link small-del", "삭제", ex.name + " 삭제");
+      del.addEventListener("click", function () {
+        if (del.dataset.arm !== "1") { del.dataset.arm = "1"; del.textContent = "기록까지 지워요. 한 번 더"; return; }
+        u.exams = u.exams.filter(function (id) { return id !== ex.id; });
+        delete store.exams[ex.id];
+        if (EXAM && EXAM.id === ex.id) EXAM = null;
+        save(); render();
+      });
+      row.append(main, del);
+      list.append(row);
+    });
+    var add = btn("btn primary block add-btn");
+    add.innerHTML = IC.plus;
+    add.append(document.createTextNode(" 시험 추가하기"));
+    add.addEventListener("click", function () { go("add-exam"); });
+    list.append(add);
+    $screen.append(list);
+
+    var more = card("내 설정");
+    var row2 = el("div", "btnrow");
+    var ch = btn("btn small", "캐릭터 바꾸기");
+    ch.addEventListener("click", function () {
+      openSheet("캐릭터 바꾸기", function (sh) {
+        sh.body.append(charPicker(u.char, function (k) { u.char = k; save(); sh.close(); render(); }));
+      });
+    });
+    var sw = btn("btn small", "사용자 바꾸기");
+    sw.addEventListener("click", function () { setSession(null); EXAM = null; go("users"); });
+    var rm = btn("btn small danger", "이 사용자 삭제");
+    rm.addEventListener("click", function () {
+      if (rm.dataset.arm !== "1") { rm.dataset.arm = "1"; rm.textContent = "모든 시험 기록이 지워져요. 한 번 더"; return; }
+      examsOf(u).forEach(function (ex) { delete store.exams[ex.id]; });
+      store.users = store.users.filter(function (x) { return x.id !== u.id; });
+      EXAM = null; setSession(null); save(); go("users");
+    });
+    row2.append(ch, sw, rm);
+    more.append(row2);
+    $screen.append(more);
+  }
+
+  function charPicker(cur, onPick) {
+    var g = el("div", "char-pick");
+    g.setAttribute("role", "radiogroup");
+    CHAR_ORDER.forEach(function (k) {
+      var b = btn("char-opt");
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", String(k === cur));
+      b.append(avatar(k, 3, "lg"), el("b", null, CHARS[k].name), el("small", null, CHARS[k].stages[5] + "까지 성장"));
+      b.addEventListener("click", function () {
+        [].forEach.call(g.children, function (x) { x.setAttribute("aria-checked", String(x === b)); });
+        onPick(k);
+      });
+      g.append(b);
+    });
+    return g;
+  }
+  function optCards(opts, cur, onPick) {
+    var g = el("div", "opt-list");
+    g.setAttribute("role", "radiogroup");
+    opts.forEach(function (o) {
+      var b = btn("opt-card");
+      b.setAttribute("role", "radio");
+      b.setAttribute("aria-checked", String(o.value === cur));
+      b.append(el("b", null, o.label));
+      if (o.desc) b.append(el("small", null, o.desc));
+      b.addEventListener("click", function () {
+        [].forEach.call(g.children, function (x) { x.setAttribute("aria-checked", String(x === b)); });
+        onPick(o.value);
+      });
+      g.append(b);
+    });
+    return g;
+  }
+  function dateInput(val) {
+    var i = document.createElement("input");
+    i.type = "date"; i.value = val || "";
+    return i;
+  }
+
+  function aiPrompt(d) {
+    var tags = TAG_SETS[d.kind] || TAG_SETS.custom;
+    var last = isoAdd(d.date, -1);
+    return "나는 " + d.examName + " 시험을 " + d.date + "(" + wdOf(d.date) + ")에 봐. " + d.start + "부터 공부를 시작해.\n" +
+      "평일에는 하루 " + d.wk + "분, 주말에는 하루 " + d.we + "분 공부할 수 있어.\n" +
+      "(여기에 교재 목차나 공부 범위를 붙여 넣으면 더 정확해져요)\n\n" +
+      d.start + "부터 " + last + "까지 날짜별 공부 계획을 짜 줘.\n" +
+      "- 하루 계획 시간(min)의 합이 그날 공부 가능 시간을 넘지 않게\n" +
+      "- 시험 1~2주 전부터는 모의고사와 오답 복습 위주로\n" +
+      "- 시험 전날은 가볍게 정리만\n\n" +
+      "결과는 설명 없이 아래 형식의 JSON 배열만 출력해 줘.\n" +
+      '[{"date":"YYYY-MM-DD","items":[{"slot":"퇴근 후","min":60,"tag":"t","title":"할 일","detail":"한 줄 설명"}]}]\n' +
+      "tag는 다음 중 하나: " + TAG_ORDER.map(function (k) { return k + "=" + tags[k]; }).join(", ");
+  }
+  // AI 답변(JSON)을 시작일~시험일 날짜표에 채운다. 범위 밖 날짜는 버린다.
+  function parseAiPlan(text, d) {
+    var a = text.indexOf("["), b = text.lastIndexOf("]");
+    if (a < 0 || b <= a) throw new Error("JSON 배열([ ... ])을 찾지 못했어요.");
+    var arr = JSON.parse(text.slice(a, b + 1));
+    if (!Array.isArray(arr)) throw new Error("배열 형식이 아니에요.");
+    var tags = TAG_SETS[d.kind] || TAG_SETS.custom;
+    var days = skeletonDays(d.start, d.date, 0, 0, false), byIso = {}, n = 0, skipped = 0;
+    days.forEach(function (x) { byIso[x.iso] = x; });
+    arr.forEach(function (x) {
+      var iso = x && (x.date || x.iso);
+      if (typeof iso !== "string" || !byIso[iso] || !Array.isArray(x.items)) { skipped++; return; }
+      x.items.forEach(function (it) {
+        if (!it || typeof it !== "object") return;
+        var min = Number(it.min);
+        byIso[iso].items.push({
+          slot: typeof it.slot === "string" ? it.slot.slice(0, 30) : "",
+          min: isFinite(min) ? clamp(Math.round(min), 0, 600) : 0,
+          tag: tags[it.tag] ? it.tag : "t", parts: [], pages: "",
+          title: typeof it.title === "string" && it.title.trim() ? it.title.slice(0, 80) : "공부",
+          detail: typeof it.detail === "string" ? it.detail.slice(0, 300) : ""
+        });
+        n++;
+      });
+    });
+    if (!n) throw new Error("시작일~시험일 사이에 들어갈 계획이 없어요.");
+    return { days: days, items: n, skipped: skipped };
+  }
+
+  function createExam(u, d) {
+    var ex = {
+      id: newId("e"), kind: d.kind, name: d.examName, date: d.date, start: d.start,
+      wk: d.wk, we: d.we, base: d.planMode === "itp" ? "itp" : "none", state: emptyState(), created: realToday()
+    };
+    if (ex.base !== "itp") {
+      ex.days = d.planMode === "ai" ? d.aiDays : skeletonDays(d.start, d.date, d.wk, d.we, true);
+      ex.goalMin = Math.max(600, planTotal(ex.days));
+    }
+    store.exams[ex.id] = ex;
+    u.exams = (u.exams || []).concat(ex.id);
+    u.lastExam = ex.id;
+    return ex;
+  }
+
+  function setupScreen(mode) {
+    var migrate = mode === "user" && !store.users.length && hasOldData();
+    var steps = mode === "exam" ? ["exam", "time", "plan"] : migrate ? ["name", "char"] : ["name", "char", "exam", "time", "plan"];
+    var d = {
+      name: "", pin: "", pin2: "", char: "chick", kind: "itp", examName: EXAM_KINDS.itp.name,
+      date: ITP_DATE, start: realToday(), wk: 60, we: 180, planMode: "itp", aiDays: null, aiText: ""
+    };
+    var step = 0;
+
+    function draw() {
+      $screen.textContent = "";
+      var key = steps[step];
+      var back = step > 0 ? null : mode === "exam" ? "exams" : store.users.length ? "users" : null;
+      var head = screenHead(
+        { name: migrate ? "기존 정처기 기록 옮기기" : "반가워요! 누구예요?", char: "함께 공부할 친구를 골라요", exam: "어떤 시험을 준비하나요?", time: "하루에 얼마나 공부할 수 있어요?", plan: "계획은 어떻게 세울까요?" }[key],
+        { name: migrate ? "이 기기에 있던 정처기 기록을 쓸 사용자를 만들어요" : "이름과 비밀번호 4자리를 정해요", char: "공부한 시간만큼 알에서 깨어나 자라요", exam: "시험 이름과 날짜를 정해요", time: "이 시간으로 날짜별 계획 칸을 만들어요", plan: "나중에 '계획 수정'으로 언제든 고칠 수 있어요" }[key],
+        back
+      );
+      if (step > 0) head.querySelector(".nav-btn") || head.prepend(prevBtn());
+      var dots = el("div", "steps");
+      steps.forEach(function (_, i) { dots.append(el("i", i === step ? "on" : i < step ? "done" : "")); });
+      var body = el("section", "card wiz");
+      var msg = el("p", "note err");
+      msg.setAttribute("aria-live", "polite");
+      var next = btn("btn primary block add-btn", step === steps.length - 1 ? "시작하기" : "다음");
+      var check = STEP[key](body, msg);
+      next.addEventListener("click", function () {
+        var err = check();
+        if (err) { msg.textContent = err; return; }
+        if (step < steps.length - 1) { step++; draw(); window.scrollTo(0, 0); return; }
+        finish();
+      });
+      $screen.append(head, dots, body, msg, next);
+    }
+    function prevBtn() {
+      var b = btn("nav-btn", null, "이전 단계");
+      b.innerHTML = IC.back;
+      b.addEventListener("click", function () { step--; draw(); });
+      return b;
+    }
+
+    var STEP = {
+      name: function (body) {
+        var ni = textInput(d.name, "예: 지민");
+        ni.maxLength = 12;
+        var p1 = pinInput(d.pin), p2 = pinInput(d.pin2);
+        body.append(field("이름", ni), field("비밀번호 4자리", p1), field("비밀번호 한 번 더", p2));
+        return function () {
+          d.name = ni.value.trim(); d.pin = p1.value; d.pin2 = p2.value;
+          if (!d.name) return "이름을 적어 주세요.";
+          var dup = store.users.some(function (u) { return u.name.toLowerCase() === d.name.toLowerCase(); });
+          if (dup) return "'" + d.name + "'은(는) 이미 있는 이름이에요. 다른 이름을 써 주세요.";
+          if (!/^\d{4}$/.test(d.pin)) return "비밀번호는 숫자 4자리예요.";
+          if (d.pin !== d.pin2) return "비밀번호 두 개가 서로 달라요.";
+          return "";
+        };
+      },
+      char: function (body) {
+        body.append(charPicker(d.char, function (k) { d.char = k; }));
+        return function () { return ""; };
+      },
+      exam: function (body) {
+        var nameF = field("시험 이름", textInput(d.kind === "custom" ? d.examName : "", "예: 컴활 1급 필기"));
+        var nameI = nameF.querySelector("input");
+        var di = dateInput(d.date), si = dateInput(d.start);
+        nameF.hidden = d.kind !== "custom";
+        body.append(optCards([
+          { label: "정보처리기사 실기", desc: "10/25 시험 · 교재 기반 기본 계획 있음", value: "itp" },
+          { label: "AWS SAA-C03", desc: "솔루션스 아키텍트 어소시에이트", value: "aws" },
+          { label: "직접 등록", desc: "다른 시험 이름을 적어요", value: "custom" }
+        ], d.kind, function (v) {
+          if (v !== d.kind) di.value = EXAM_KINDS[v].date;
+          d.kind = v;
+          nameF.hidden = v !== "custom";
+          if (v !== "custom") d.examName = EXAM_KINDS[v].name;
+        }), nameF, field("시험 날짜", di), field("공부 시작일", si));
+        return function () {
+          if (d.kind === "custom") d.examName = nameI.value.trim();
+          d.date = di.value; d.start = si.value;
+          if (!d.examName) return "시험 이름을 적어 주세요.";
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d.date)) return "시험 날짜를 골라 주세요.";
+          if (!/^\d{4}-\d{2}-\d{2}$/.test(d.start)) return "공부 시작일을 골라 주세요.";
+          if (d.start > d.date) return "공부 시작일이 시험 날짜보다 늦어요.";
+          if (isoDiff(d.start, d.date) > 400) return "계획 기간은 400일까지 만들 수 있어요.";
+          if (!(d.kind === "itp" && d.date === ITP_DATE) && d.planMode === "itp") d.planMode = "blank";
+          if (d.kind === "itp" && d.date === ITP_DATE) d.planMode = "itp";
+          return "";
+        };
+      },
+      time: function (body) {
+        var total = el("p", "note");
+        function est() {
+          var t = 0;
+          for (var iso = d.start; iso < d.date; iso = isoAdd(iso, 1)) t += isWeekend(iso) ? d.we : d.wk;
+          total.textContent = "시험까지 " + isoDiff(d.start, d.date) + "일, 최대 약 " + fmtMin(t) + " 공부할 수 있어요.";
+        }
+        body.append(fieldBlock("평일 (월~금)", minutePicker(d.wk, [30, 60, 90, 120, 180], function (v) { d.wk = clamp(Math.round(v) || 0, 0, 900); est(); })));
+        body.append(fieldBlock("주말 (토·일)", minutePicker(d.we, [60, 120, 180, 240, 300], function (v) { d.we = clamp(Math.round(v) || 0, 0, 900); est(); })));
+        body.append(total);
+        est();
+        return function () { return d.wk + d.we > 0 ? "" : "평일이나 주말 중 하루는 공부 시간을 정해 주세요."; };
+      },
+      plan: function (body) {
+        var canItp = d.kind === "itp" && d.date === ITP_DATE;
+        var opts = [];
+        if (canItp) opts.push({ label: "정처기 기본 계획 쓰기", desc: "교재 PART 01~08 기준 9/29~10/25 계획 (약 47시간)", value: "itp" });
+        opts.push({ label: "빈 계획표 만들기", desc: "공부 가능 시간만큼 날짜별 칸을 만들고, 내용은 '계획 수정'에서 직접 적어요", value: "blank" });
+        opts.push({ label: "AI랑 같이 세우기", desc: "프롬프트를 복사해 ChatGPT·Claude 등에 붙여 넣고, 답변을 다시 붙여 넣어요", value: "ai" });
+        var ai = el("div", "ai-box");
+        var pr = document.createElement("textarea");
+        pr.readOnly = true; pr.className = "prompt";
+        pr.value = aiPrompt(d);
+        var cp = btn("btn small", "프롬프트 복사");
+        var cpMsg = el("span", "note");
+        cp.addEventListener("click", function () {
+          var done = function () { cpMsg.textContent = " 복사했어요!"; };
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(pr.value).then(done, function () { pr.select(); cpMsg.textContent = " 길게 눌러 직접 복사해 주세요."; });
+          else { pr.select(); cpMsg.textContent = " 길게 눌러 직접 복사해 주세요."; }
+        });
+        var ans = document.createElement("textarea");
+        ans.placeholder = "AI 답변(JSON)을 여기에 붙여 넣어요";
+        ans.value = d.aiText;
+        var ld = btn("btn small primary", "불러오기");
+        var res = el("p", "note");
+        res.setAttribute("aria-live", "polite");
+        ld.addEventListener("click", function () {
+          d.aiText = ans.value;
+          try {
+            var r = parseAiPlan(ans.value, d);
+            d.aiDays = r.days;
+            res.textContent = "계획 " + r.items + "개를 불러왔어요." + (r.skipped ? " (기간 밖 날짜 " + r.skipped + "개는 뺐어요)" : "");
+            res.style.color = "var(--mint-ink)";
+          } catch (e) {
+            d.aiDays = null;
+            res.textContent = "불러오지 못했어요: " + e.message;
+            res.style.color = "var(--danger)";
+          }
+        });
+        var r1row = el("div", "btnrow"); r1row.append(cp, cpMsg);
+        var r2row = el("div", "btnrow"); r2row.append(ld);
+        ai.append(fieldBlock("1. 프롬프트 복사", pr), r1row, fieldBlock("2. AI 답변 붙여 넣기", ans), r2row, res);
+        ai.hidden = d.planMode !== "ai";
+        if (!canItp && d.planMode === "itp") d.planMode = "blank";
+        body.append(optCards(opts, d.planMode, function (v) { d.planMode = v; ai.hidden = v !== "ai"; }), ai);
+        return function () {
+          if (d.planMode === "ai" && !d.aiDays) return "AI 답변을 붙여 넣고 '불러오기'를 눌러 주세요. 아니면 빈 계획표로 시작해도 돼요.";
+          return "";
+        };
+      }
+    };
+
+    function finish() {
+      var u = USER;
+      if (mode !== "exam") {
+        u = { id: newId("u"), name: d.name, char: d.char, exams: [], created: realToday() };
+        u.pin = hashPin(u.id, d.pin);
+        store.users.push(u);
+        if (migrate) {
+          var ex = { id: newId("e"), kind: "itp", name: EXAM_KINDS.itp.name, date: ITP_DATE, start: PLAN.days[0].iso, base: "itp", state: loadOld(), created: realToday() };
+          store.exams[ex.id] = ex;
+          u.exams = [ex.id]; u.lastExam = ex.id;
+        }
+      }
+      if (!migrate) createExam(u, d);
+      USER = u;
+      EXAM = null;
+      setSession(u.id);
+      save();
+      toast("🎉 준비 완료! 오늘부터 같이 공부해요");
+      go("today");
+    }
+    draw();
+  }
+  function pinInput(v) {
+    var i = document.createElement("input");
+    i.type = "password"; i.inputMode = "numeric"; i.maxLength = 4; i.autocomplete = "off";
+    i.pattern = "[0-9]*"; i.placeholder = "••••"; i.value = v || "";
+    i.className = "pin-input";
+    i.addEventListener("input", function () { i.value = i.value.replace(/\D/g, "").slice(0, 4); });
+    return i;
+  }
+
+  /* ---------- routing ---------- */
+  function showTabs(on) { $tabs.hidden = !on; }
   function render() {
     closeSheet(true);
-    route = location.hash === "#total" ? "total" : "today";
+    clearTimeout(bubbleTimer);
+    setKeys(null);
+    ui = {};
+    window.scrollTo(0, 0);
+    var h = location.hash.replace(/^#/, "");
+    USER = userById(sessionUser());
+    if (!store.users.length && h !== "new") return go("new");
+    showTabs(false);
+    if (h === "new") return setupScreen("user");
+    if (h.indexOf("lock/") === 0) {
+      var lu = userById(h.slice(5));
+      return lu ? pinScreen(lu) : go("users");
+    }
+    if (!USER || h === "users") return h === "users" ? usersScreen() : go("users");
+    if (h === "add-exam") return setupScreen("exam");
+    if (h === "exams") return examsScreen();
+    var list = examsOf(USER);
+    if (!list.length) return go("add-exam");
+    if (!EXAM || USER.exams.indexOf(EXAM.id) < 0 || store.exams[EXAM.id] !== EXAM) {
+      openExam(store.exams[USER.lastExam] && USER.exams.indexOf(USER.lastExam) >= 0 ? store.exams[USER.lastExam] : list[0]);
+    }
+    route = h === "total" ? "total" : "today";
+    showTabs(true);
     var tt = document.getElementById("tab-today"), tl = document.getElementById("tab-total");
     if (route === "today") { tt.setAttribute("aria-current", "page"); tl.removeAttribute("aria-current"); }
     else { tl.setAttribute("aria-current", "page"); tt.removeAttribute("aria-current"); }
-    clearTimeout(bubbleTimer);
-    ui = {};
     if (route === "today") mountToday(); else mountTotal();
-    window.scrollTo(0, 0);
   }
 
   TODAY = todayInfo();
-  sel = defaultSel();
-  load();
-  state.lv = stageOf(totals().act);
+  loadStore();
   window.addEventListener("hashchange", render);
   document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState !== "visible") return;
+    if (document.visibilityState !== "visible" || !EXAM) return;
     var t = todayInfo();
     if (t.iso !== TODAY.iso) { TODAY = t; sel = defaultSel(); render(); }
   });
