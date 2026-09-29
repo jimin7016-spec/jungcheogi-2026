@@ -10,23 +10,24 @@
 
   // 실제 공부시간(분)이 쌓일수록 자라는 캐릭터 단계. 전체 계획이 약 47시간이라 40시간에 마지막 단계.
   var STAGES = [
-    { min: 0, name: "잠꾸러기 알", line: "쿨쿨… 공부하면 깨어나요" },
-    { min: 120, name: "톡톡 알", line: "안에서 뭔가 꿈틀거려요!" },
-    { min: 360, name: "삐약이", line: "드디어 껍질을 깨고 나왔어요" },
-    { min: 840, name: "병아리", line: "두 발로 씩씩하게 섰어요" },
-    { min: 1560, name: "공부 병아리", line: "안경 쓰고 열공 모드 돌입" },
-    { min: 2400, name: "합격 꼬꼬", line: "합격 준비 완료! 시험장으로!" }
+    { min: 0, name: "말랑 알", line: "쿨쿨… 공부하면 깨어나요" },
+    { min: 120, name: "금 간 알", line: "톡톡! 안에서 꿈틀거려요" },
+    { min: 360, name: "갓 부화 삐약이", line: "껍질 모자 쓰고 세상 구경 중" },
+    { min: 840, name: "아기 병아리", line: "두 발로 씩씩하게 섰어요" },
+    { min: 1560, name: "중병아리", line: "연필 들고 열공 모드 돌입" },
+    { min: 2400, name: "늠름한 합격 닭", line: "머리띠 질끈! 시험장 갈 준비 완료" }
   ];
   var CHEERS = [
-    "10분만 해도 어제보다 한 발 앞이야!",
-    "틀린 문제는 점수로 바뀌는 중이야",
+    "오늘도 삐약! 10분만 해도 한 발 앞이야",
+    "틀린 문제는 점수로 바뀌는 중이야 삐약",
     "60점만 넘기면 돼. 할 수 있어!",
     "SQL은 손으로 써봐야 내 거가 돼",
-    "물 한 잔 마시고 다시 가보자",
+    "물 한 잔 마시고 다시 가보자 삐약",
     "코드 문제는 변수 표 그리기!",
-    "오늘 공부하면 나도 쑥쑥 커!",
-    "피곤하면 짧게라도, 끊기지만 않으면 돼"
+    "네가 공부하면 나도 쑥쑥 커!",
+    "짧게라도 좋아, 끊기지만 않으면 돼"
   ];
+  var DONE_CHEERS = ["오늘도 삐약!", "잘했어 삐약!", "한 칸 클리어!", "쑥쑥 크는 중!", "최고야 삐약!"];
 
   var $screen = document.getElementById("screen");
   var $sheetRoot = document.getElementById("sheet-root");
@@ -209,65 +210,117 @@
     var st = stageOf(act);
     if (st > state.lv) {
       state.lv = st; save();
-      toast("🎉 " + STAGES[st].name + "로 성장했어요!");
+      toast("🎉 레벨 업! '" + STAGES[st].name + "' 등장!");
       hop();
+      celebrate();
     } else if (st < state.lv) {
       state.lv = st; save();
     }
   }
 
   /* ---------- character ---------- */
+  // 오리지널 병아리 (viewBox 120x120, 바닥 y≈110). .body는 통통 튀는 idle, .eyes는 눈 깜빡임.
+  var INK = "#4A3B32";
   function chickSVG(st) {
     var s = '<svg viewBox="0 0 120 120" aria-hidden="true">';
-    s += '<ellipse cx="60" cy="111" rx="30" ry="5" fill="rgba(120,80,20,.14)"/>';
-    var cheek = function (y) {
-      return '<ellipse cx="44" cy="' + y + '" rx="5.5" ry="3.2" fill="#FFA9A9" opacity=".75"/><ellipse cx="76" cy="' + y + '" rx="5.5" ry="3.2" fill="#FFA9A9" opacity=".75"/>';
-    };
-    var eyes = function (y) {
-      return '<circle cx="50" cy="' + y + '" r="4.2" fill="#3B2F2A"/><circle cx="70" cy="' + y + '" r="4.2" fill="#3B2F2A"/>' +
-        '<circle cx="51.4" cy="' + (y - 1.5) + '" r="1.4" fill="#fff"/><circle cx="71.4" cy="' + (y - 1.5) + '" r="1.4" fill="#fff"/>';
-    };
-    var beak = function (y) { return '<path d="M55 ' + y + 'l5 5.5 5-5.5q-5-2.5-10 0z" fill="#FF9B3D"/>'; };
-    if (st <= 1) {
-      s += '<path d="M60 20c19 0 33 29 33 52s-14 37-33 37-33-14-33-37 14-52 33-52z" fill="#FFFDF6" stroke="#EAD8B0" stroke-width="2.5"/>';
-      s += '<ellipse cx="44" cy="46" rx="5" ry="4" fill="#F7E8C4"/><ellipse cx="76" cy="92" rx="6.5" ry="4" fill="#F7E8C4"/><ellipse cx="79" cy="46" rx="3" ry="2.5" fill="#F7E8C4"/>';
-      s += cheek(83);
-      if (st === 0) {
-        s += '<path d="M45 74q5 4.5 10 0M65 74q5 4.5 10 0" stroke="#3B2F2A" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
-        s += '<text x="86" y="30" font-size="13" fill="#B9A67E" font-family="sans-serif" font-weight="700">z</text><text x="95" y="20" font-size="9" fill="#CDBD98" font-family="sans-serif" font-weight="700">z</text>';
-      } else {
-        s += eyes(74) + '<ellipse cx="60" cy="84" rx="3" ry="2.4" fill="#3B2F2A"/>';
-        s += '<path d="M31 60l8 5 6-6 7 7 6-6 7 6 6-5 8 4" stroke="#C7AF80" stroke-width="2.2" fill="none" stroke-linejoin="round" stroke-linecap="round"/>';
-        s += '<path d="M20 50l-6-3M22 42l-5-6M100 50l6-3M98 42l5-6" stroke="#E7C66A" stroke-width="2.4" stroke-linecap="round"/>';
-      }
-    } else if (st === 2) {
-      s += '<path d="M52 36q2-10 7-3q3-8 7 1" fill="none" stroke="#F5BE24" stroke-width="3.2" stroke-linecap="round"/>';
-      s += '<circle cx="60" cy="62" r="27" fill="#FFD54A"/>';
-      s += eyes(58) + beak(64) + cheek(67);
-      s += '<path d="M27 76l8-8 8 8 8-8 9 8 9-8 8 8 8-8 8 8c1 20-13 33-33 33s-34-13-33-33z" fill="#FFFDF6" stroke="#EAD8B0" stroke-width="2.5" stroke-linejoin="round"/>';
-      s += '<ellipse cx="44" cy="94" rx="5" ry="3.5" fill="#F7E8C4"/><ellipse cx="78" cy="90" rx="4" ry="3" fill="#F7E8C4"/>';
-    } else {
-      var faceY = 63;
-      if (st === 5) {
-        s += '<path d="M60 16l32 11-32 11-32-11z" fill="#3E4360"/><path d="M45 31v9q15 6 30 0v-9" fill="#2D3148"/>';
-        s += '<path d="M92 27v15" stroke="#FFC23A" stroke-width="2.4" stroke-linecap="round"/><circle cx="92" cy="44" r="3.4" fill="#FFC23A"/>';
-      } else {
-        s += '<path d="M53 42q2-11 7-3q3-9 7 1" fill="none" stroke="#F5BE24" stroke-width="3.2" stroke-linecap="round"/>';
-      }
-      s += '<path d="M48 101v7m-5 0h10M72 101v7m-5 0h10" stroke="#FF9B3D" stroke-width="3.2" stroke-linecap="round"/>';
-      s += '<ellipse cx="27" cy="77" rx="7.5" ry="12" fill="#F7C531" transform="rotate(22 27 77)"/><ellipse cx="93" cy="77" rx="7.5" ry="12" fill="#F7C531" transform="rotate(-22 93 77)"/>';
-      s += '<ellipse cx="60" cy="72" rx="34" ry="32" fill="#FFD54A"/><ellipse cx="60" cy="84" rx="21" ry="16" fill="#FFE58C"/>';
-      s += eyes(faceY) + beak(faceY + 6) + cheek(faceY + 9);
-      if (st === 4) {
-        s += '<circle cx="50" cy="' + faceY + '" r="8.5" fill="rgba(255,255,255,.25)" stroke="#5B4636" stroke-width="2.4"/><circle cx="70" cy="' + faceY + '" r="8.5" fill="rgba(255,255,255,.25)" stroke="#5B4636" stroke-width="2.4"/><path d="M58.5 ' + faceY + 'h3" stroke="#5B4636" stroke-width="2.4"/>';
-        s += '<path d="M38 86l22 6 22-6v17l-22 6-22-6z" fill="#7CC0F0" stroke="#3E86BF" stroke-width="2" stroke-linejoin="round"/><path d="M60 92v17" stroke="#3E86BF" stroke-width="2"/><path d="M44 92l11 3M44 97l11 3M65 95l11-3M65 100l11-3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>';
-      }
-      if (st === 5) {
-        s += '<g transform="rotate(-18 86 90)"><rect x="70" y="84" width="30" height="11" rx="5" fill="#FFF8E4" stroke="#E0C98E" stroke-width="2"/><path d="M84 84v11" stroke="#E0564B" stroke-width="3"/></g>';
-        s += '<path d="M16 40l2.5 5 5 2.5-5 2.5-2.5 5-2.5-5-5-2.5 5-2.5zM104 58l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#FFC23A"/>';
-      }
+    s += '<ellipse cx="60" cy="111" rx="28" ry="4.5" fill="rgba(74,59,50,.13)"/><g class="body">';
+    function eyes(y, dx, r) {
+      dx = dx || 10; r = r || 4.3;
+      return '<g class="eyes"><ellipse cx="' + (60 - dx) + '" cy="' + y + '" rx="' + r + '" ry="' + (r + 0.6) + '" fill="' + INK + '"/><ellipse cx="' + (60 + dx) + '" cy="' + y + '" rx="' + r + '" ry="' + (r + 0.6) + '" fill="' + INK + '"/>' +
+        '<circle cx="' + (61.5 - dx) + '" cy="' + (y - 1.8) + '" r="1.6" fill="#fff"/><circle cx="' + (61.5 + dx) + '" cy="' + (y - 1.8) + '" r="1.6" fill="#fff"/></g>';
     }
-    return s + "</svg>";
+    function beak(y) { return '<path d="M54 ' + y + 'Q60 ' + (y - 3.5) + ' 66 ' + y + 'Q60 ' + (y + 6.5) + ' 54 ' + y + 'Z" fill="#FF9F45"/>'; }
+    function cheeks(y, dx) {
+      return '<ellipse cx="' + (60 - dx) + '" cy="' + y + '" rx="5.5" ry="3.3" fill="#FFA99A" opacity=".75"/><ellipse cx="' + (60 + dx) + '" cy="' + y + '" rx="5.5" ry="3.3" fill="#FFA99A" opacity=".75"/>';
+    }
+    function feet(y, gap) {
+      return '<path d="M' + (60 - gap) + ' ' + y + 'v6m-5 0h10M' + (60 + gap) + ' ' + y + 'v6m-5 0h10" stroke="#FF9F45" stroke-width="3.4" stroke-linecap="round"/>';
+    }
+    var EGG = '<path d="M60 18c20 0 34 30 34 54s-15 38-34 38-34-14-34-38 14-54 34-54z" fill="#FFFDF4" stroke="#EED9A4" stroke-width="2.5"/>' +
+      '<ellipse cx="45" cy="44" rx="5" ry="4" fill="#FCEFC8"/><ellipse cx="78" cy="93" rx="6.5" ry="4" fill="#FCEFC8"/><ellipse cx="80" cy="45" rx="3" ry="2.5" fill="#FCEFC8"/>';
+    var SHELL = '#FFFDF4', SHELL_LINE = '#EED9A4', BODY = '#FFD23F', BELLY = '#FFE68A', WING = '#F5C020';
+
+    if (st === 0) { // 말랑 알: 쿨쿨 자는 중
+      s += EGG + cheeks(84, 15);
+      s += '<path d="M44 75q5 4.5 10 0M66 75q5 4.5 10 0" stroke="' + INK + '" stroke-width="2.6" fill="none" stroke-linecap="round"/></g>';
+      s += '<text x="88" y="30" font-size="13" fill="#C9B58A" font-family="sans-serif" font-weight="800">z</text><text x="97" y="19" font-size="9" fill="#D8C8A4" font-family="sans-serif" font-weight="800">z</text>';
+      return s + '</svg>';
+    }
+    if (st === 1) { // 금 간 알: 눈 뜨고 들썩
+      s += EGG + eyes(74, 10, 3.8) + '<ellipse cx="60" cy="84" rx="3" ry="2.6" fill="' + INK + '"/>' + cheeks(83, 17);
+      s += '<path d="M28 58l8 5 7-6 7 7 6-6 7 6 7-5 9 4" stroke="#CDAE6E" stroke-width="2.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/></g>';
+      s += '<path d="M18 52l-7-3M21 43l-5-6M102 52l7-3M99 43l5-6" stroke="#FFC43D" stroke-width="2.6" stroke-linecap="round"/>';
+      return s + '</svg>';
+    }
+    if (st === 2) { // 부화: 껍질 모자
+      s += '<circle cx="60" cy="64" r="27" fill="' + BODY + '"/>' + eyes(60, 10) + beak(66) + cheeks(69, 17);
+      s += '<path d="M28 80l8-8 8 8 8-8 8 8 8-8 8 8 8-8 8 8c1 19-13 30-32 30s-33-11-32-30z" fill="' + SHELL + '" stroke="' + SHELL_LINE + '" stroke-width="2.5" stroke-linejoin="round"/>';
+      s += '<ellipse cx="45" cy="97" rx="5" ry="3.5" fill="#FCEFC8"/><ellipse cx="77" cy="93" rx="4" ry="3" fill="#FCEFC8"/>';
+      s += '<path d="M42 42q18-24 36 0l-6 4-6-4-6 4-6-4-6 4z" fill="' + SHELL + '" stroke="' + SHELL_LINE + '" stroke-width="2.5" stroke-linejoin="round" transform="rotate(-14 60 36)"/>';
+      return s + '</g></svg>';
+    }
+    if (st === 3) { // 아기 병아리
+      s += feet(101, 11);
+      s += '<ellipse cx="31" cy="79" rx="7" ry="10" fill="' + WING + '" transform="rotate(25 31 79)"/><ellipse cx="89" cy="79" rx="7" ry="10" fill="' + WING + '" transform="rotate(-25 89 79)"/>';
+      s += '<circle cx="60" cy="72" r="31" fill="' + BODY + '"/><ellipse cx="60" cy="85" rx="18" ry="13" fill="' + BELLY + '"/>';
+      s += '<path d="M55 43q1-10 5.5-3.5q3-8 6.5 1.5" fill="none" stroke="' + WING + '" stroke-width="3.4" stroke-linecap="round"/>';
+      s += eyes(67, 10) + beak(74) + cheeks(77, 18);
+      return s + '</g></svg>';
+    }
+    if (st === 4) { // 중병아리: 볏이 나고 연필을 번쩍
+      s += feet(102, 12);
+      s += '<ellipse cx="28" cy="76" rx="8" ry="13" fill="' + WING + '" transform="rotate(22 28 76)"/>';
+      s += '<path d="M52 37q-1-9 5-7q2-7 7-2q5-4 6 4z" fill="#FF8A7A"/>';
+      s += '<ellipse cx="60" cy="71" rx="33" ry="36" fill="' + BODY + '"/><ellipse cx="60" cy="86" rx="20" ry="17" fill="' + BELLY + '"/>';
+      s += eyes(61, 11) + beak(68) + cheeks(72, 19);
+      s += '<g transform="rotate(-30 98 60)"><rect x="94" y="30" width="8" height="30" rx="2" fill="#7ED9A6"/><path d="M94 60h8l-4 8z" fill="#FFE0B0"/><path d="M97 65.5h2l-1 2.5z" fill="' + INK + '"/><rect x="94" y="26" width="8" height="5" rx="1.5" fill="#FF9FB0"/></g>';
+      s += '<ellipse cx="91" cy="70" rx="8" ry="13" fill="' + WING + '" transform="rotate(-40 91 70)"/>';
+      return s + '</g></svg>';
+    }
+    // 5: 늠름한 합격 닭 — 꼬리깃, 볏, 합격 머리띠
+    s += '<path d="M30 74q-20-6-18-30q10 10 22 16z" fill="#FF9F45"/><path d="M31 68q-16-14-6-34q6 14 14 22z" fill="#FFB86B"/><path d="M32 80q-22 2-26-18q12 6 26 8z" fill="' + BODY + '"/>';
+    s += feet(103, 12);
+    s += '<path d="M48 39q-2-12 7-9q2-10 10-4q7-5 10 5q3 8-7 10z" fill="#FF6B6B"/>';
+    s += '<ellipse cx="62" cy="71" rx="32" ry="35" fill="' + BODY + '"/><ellipse cx="64" cy="87" rx="20" ry="16" fill="' + BELLY + '"/>';
+    s += '<path d="M34 49q30-10 58 0v8q-28-9-58 0z" fill="#fff"/><circle cx="63" cy="49.5" r="3.6" fill="#FF6B6B"/>';
+    s += '<path d="M35 51q-10 0-14 6M35 54q-8 4-10 11" stroke="#fff" stroke-width="4" stroke-linecap="round" fill="none"/>';
+    s += '<path d="M60 76q0 9 3.5 10q3.5-1 3.5-10z" fill="#FF6B6B"/>';
+    s += eyes(64, 11) + beak(71) + cheeks(75, 19);
+    s += '<ellipse cx="93" cy="80" rx="8" ry="13" fill="' + WING + '" transform="rotate(-18 93 80)"/></g>';
+    s += '<path d="M14 26l2.5 5 5 2.5-5 2.5-2.5 5-2.5-5-5-2.5 5-2.5zM106 26l2 4 4 2-4 2-2 4-2-4-4-2 4-2z" fill="#FFC43D"/>';
+    return s + '</svg>';
+  }
+  function celebrate() {
+    var host = ui.pet;
+    if (!host || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+    var glow = el("div", "glow");
+    var box = el("div", "confetti");
+    var cols = ["#FFD23F", "#FF9F45", "#7ED9A6", "#8FD0FA", "#FFA99A", "#B6A4F5"];
+    for (var i = 0; i < 28; i++) {
+      var p = el("i", i % 3 === 0 ? "s" : "");
+      var a = Math.random() * Math.PI * 2, d = 70 + Math.random() * 90;
+      p.style.setProperty("--c", cols[i % cols.length]);
+      p.style.setProperty("--x", Math.round(Math.cos(a) * d) + "px");
+      p.style.setProperty("--y", Math.round(Math.sin(a) * d - 30) + "px");
+      p.style.setProperty("--r", Math.round(Math.random() * 720 - 360) + "deg");
+      p.style.animationDelay = (Math.random() * 0.12).toFixed(2) + "s";
+      box.append(p);
+    }
+    host.append(glow, box);
+    setTimeout(function () { box.remove(); glow.remove(); }, 1500);
+  }
+  // 연속 공부일: 실제 공부 기록이 있는 날이 이어진 수. 계획 없는 쉬는 날은 끊지 않고 건너뛰고,
+  // 오늘은 아직 안 했어도 끊지 않는다(하루가 끝나지 않았으니까).
+  function streakInfo() {
+    var run = 0, best = 0, today = false;
+    DAYS.forEach(function (iso) {
+      if (iso > TODAY.iso) return;
+      var s = dayStat(iso);
+      if (s.act > 0) { run++; if (iso === TODAY.iso) today = true; }
+      else if (s.total && iso !== TODAY.iso) run = 0;
+      if (run > best) best = run;
+    });
+    return { cur: run, best: best, today: today };
   }
   function setChar(node, st) {
     if (!node || node.dataset.st === String(st)) return;
@@ -289,7 +342,7 @@
     void ui.bubble.offsetWidth;
     ui.bubble.classList.add("pop");
     ui.hold = true;
-    bubbleTimer = setTimeout(function () { ui.hold = false; if (route === "today") updateToday(); }, ms || 3500);
+    bubbleTimer = setTimeout(function () { ui.hold = false; if (route === "today") updateToday(); else updateTotal(); }, ms || 3500);
   }
   function toast(text) {
     clearTimeout(toastTimer);
@@ -329,7 +382,8 @@
     updateToday();
     if (state.done[it.id]) {
       hop();
-      say(after > before ? "+" + fmtMin(after - before) + " 냠냠! 쑥쑥 크는 중" : "완료! 잘했어");
+      var cheer = DONE_CHEERS[cheerIdx++ % DONE_CHEERS.length];
+      say(after > before ? cheer + " +" + fmtMin(after - before) : cheer);
     }
     checkLevel(after);
   }
@@ -342,35 +396,96 @@
   }
 
   /* ---------- 오늘 ---------- */
-  var CLOUDS = '<svg class="cloud" style="left:6%;top:58px;width:78px" viewBox="0 0 80 36" aria-hidden="true"><path d="M16 34a14 14 0 0 1 2-28 18 18 0 0 1 33 2 12 12 0 0 1 13 26z"/></svg>' +
-    '<svg class="cloud" style="right:4%;top:110px;width:64px;opacity:.75" viewBox="0 0 80 36" aria-hidden="true"><path d="M16 34a14 14 0 0 1 2-28 18 18 0 0 1 33 2 12 12 0 0 1 13 26z"/></svg>' +
-    '<svg class="cloud" style="right:26%;top:40px;width:40px;opacity:.6" viewBox="0 0 80 36" aria-hidden="true"><path d="M16 34a14 14 0 0 1 2-28 18 18 0 0 1 33 2 12 12 0 0 1 13 26z"/></svg>';
+  function cloud(style) {
+    return '<svg class="cloud" style="' + style + '" viewBox="0 0 80 36" aria-hidden="true"><path d="M16 34a14 14 0 0 1 2-28 18 18 0 0 1 33 2 12 12 0 0 1 13 26z"/></svg>';
+  }
+  var ICON_FLAME = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5c.6 3.2 4 5 4.9 8.6A6.2 6.2 0 0 1 12 21.5 6.2 6.2 0 0 1 6 14c0-2.6 1.6-4 2.6-5.2.3 1.6 1 2.6 2.1 3.1C10.4 8.4 10.9 5 12 2.5z" fill="#FF9F45"/><path d="M12 12.5c1.9 1.6 2.8 3 2.8 4.6A2.8 2.8 0 0 1 12 20a2.8 2.8 0 0 1-2.8-2.9c0-1.6 1.2-3 2.8-4.6z" fill="#FFD23F"/></svg>';
+  var ICON_CLOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#BFE6FF"/><path d="M12 7v5l3 2" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
+  var ICON_BRAND = '<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M18 9q1-6 3.5-2q2-5 4 1" fill="none" stroke="#F5C020" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="22" r="14" fill="#FFD23F"/><circle cx="15.5" cy="20" r="2" fill="#4A3B32"/><circle cx="24.5" cy="20" r="2" fill="#4A3B32"/><path d="M17 24.5q3-2 6 0q-3 3.5-6 0z" fill="#FF9F45"/><ellipse cx="11" cy="25" rx="2.6" ry="1.6" fill="#FFA99A"/><ellipse cx="29" cy="25" rx="2.6" ry="1.6" fill="#FFA99A"/></svg>';
+  var ICON_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7ED9A6"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#1F6B45" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var ICON_PACE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#FFD23F"/><path d="M7 16l3.5-4 3 2.5L17 9" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var ICON_PENCIL ='<svg viewBox="0 0 80 80" aria-hidden="true"><g transform="rotate(-38 40 40)"><rect x="30" y="4" width="20" height="54" rx="4" fill="#FFF3C9"/><rect x="30" y="4" width="20" height="10" rx="4" fill="#FF9FB0"/><path d="M30 58h20l-10 18z" fill="#FFE0B0"/><path d="M36.5 70h7l-3.5 6z" fill="#4A3B32"/></g></svg>';
 
-  function mountToday() {
-    var scene = el("header", "scene");
-    scene.innerHTML = CLOUDS;
-    var top = el("div", "scene-top");
-    ui.ddChip = el("span", "chip dd-chip");
-    ui.lvChip = el("span", "chip");
-    top.append(ui.ddChip, ui.lvChip);
-    var stage = el("div", "stage");
+  function topbar(title) {
+    var t = el("div", "topbar");
+    var b = el("div", "brand");
+    b.innerHTML = ICON_BRAND;
+    b.append(document.createTextNode(title));
+    ui.lvChip = el("span", "lv-chip");
+    t.append(b, ui.lvChip);
+    return t;
+  }
+  function miniCard(cls, icon, label, key) {
+    var c = el("div", "card b-mini" + (cls ? " " + cls : ""));
+    var sm = el("small");
+    sm.innerHTML = icon;
+    sm.append(document.createTextNode(label));
+    ui[key] = el("div", "val");
+    ui[key + "Sub"] = el("div", "sub");
+    c.append(sm, ui[key], ui[key + "Sub"]);
+    return c;
+  }
+  function bentoTop(timeLabel) {
+    var g = el("section", "bento");
+    var dd = el("div", "card b-dday");
+    var deco = el("div", "deco");
+    deco.innerHTML = ICON_PENCIL;
+    ui.ddn = el("div", "big");
+    dd.append(el("small", null, "정보처리기사 실기까지"), ui.ddn, el("div", "date", "2026. 10. 25 (일)"), deco);
+    ui.streakCard = miniCard("b-streak", ICON_FLAME, "연속 공부", "stk");
+    g.append(dd, ui.streakCard, miniCard("", ICON_CLOCK, timeLabel, "tm"));
+    return g;
+  }
+  function petCard(big) {
+    var p = el("section", "card pet" + (big ? " big" : ""));
+    p.innerHTML = cloud("left:5%;top:30px;width:70px") + cloud("right:5%;top:84px;width:56px;opacity:.75") + cloud("right:30%;top:12px;width:36px;opacity:.6") + '<div class="hill"></div>';
+    ui.pet = p;
     ui.bubble = el("div", "bubble");
     ui.bubble.setAttribute("aria-live", "polite");
-    ui.char = btn("char", null, "병아리에게 응원 듣기");
+    ui.char = btn("char", null, "병아리 쓰다듬고 응원 듣기");
     ui.char.addEventListener("click", function () {
       hop();
       say(CHEERS[cheerIdx++ % CHEERS.length]);
     });
-    stage.append(ui.bubble, ui.char);
-    var exp = el("div", "exp");
+    var meta = el("div", "pet-meta");
+    var nm = el("div", "pet-name");
+    ui.stName = el("span");
+    ui.expNum = el("small");
+    nm.append(ui.stName, ui.expNum);
     var tr = el("div", "exp-track");
     ui.expFill = el("i");
     tr.append(ui.expFill);
-    ui.expTxt = el("small");
-    exp.append(tr, ui.expTxt);
-    scene.append(top, stage, exp, el("div", "ground"));
+    ui.expTxt = el("div", "exp-txt");
+    meta.append(nm, tr, ui.expTxt);
+    p.append(ui.bubble, ui.char, meta);
+    return p;
+  }
+  function bigNum(node, num, unit) {
+    node.textContent = String(num);
+    if (unit) node.append(el("span", null, unit));
+  }
+  function timeNum(node, min) {
+    if (min < 60) bigNum(node, Math.round(min), "분");
+    else bigNum(node, Math.round((min / 60) * 10) / 10, "시간");
+  }
+  // 두 화면 공통 상단(D-day, 레벨, 캐릭터, 경험치, 연속 공부) 갱신
+  function updateHeader(t) {
+    var st = stageOf(t.act);
+    ui.ddn.textContent = ddText();
+    ui.lvChip.textContent = "";
+    ui.lvChip.append(el("b", null, "Lv." + (st + 1)), document.createTextNode(STAGES[st].name));
+    setChar(ui.char, st);
+    ui.stName.textContent = STAGES[st].name;
+    ui.expNum.textContent = st < STAGES.length - 1 ? fmtH(t.act) + " / " + fmtH(STAGES[st + 1].min) : fmtH(t.act);
+    expUpdate(ui.expFill, ui.expTxt, t.act, st);
+    var sk = streakInfo();
+    bigNum(ui.stk, sk.cur, "일");
+    ui.stkSub.textContent = sk.today ? "오늘도 삐약! 최고 " + sk.best + "일" : sk.cur ? "오늘 하면 " + (sk.cur + 1) + "일째!" : "오늘부터 시작!";
+    ui.streakCard.classList.toggle("on", sk.today);
+    return st;
+  }
 
-    var sheet = el("section", "sheet");
+  function mountToday() {
     var nav = el("div", "datenav");
     ui.prev = btn("nav-btn", null, "이전 날");
     ui.prev.innerHTML = IC.prev;
@@ -386,10 +501,9 @@
     ui.back = btn("link back-today", "오늘로 돌아가기");
     ui.back.addEventListener("click", function () { selectDay(defaultSel()); });
     ui.body = el("div", "day-body");
-    sheet.append(nav, ui.back, ui.body);
 
     $screen.textContent = "";
-    $screen.append(scene, sheet);
+    $screen.append(topbar("삐약 플래너"), bentoTop("오늘 공부"), petCard(false), nav, ui.back, ui.body);
     fillDay();
     updateToday();
   }
@@ -543,11 +657,10 @@
     ui.back.hidden = sel === defaultSel();
 
     var t = totals();
-    var st = stageOf(t.act);
-    ui.ddChip.textContent = ddText();
-    ui.lvChip.textContent = "Lv." + (st + 1) + " " + STAGES[st].name;
-    setChar(ui.char, st);
-    expUpdate(ui.expFill, ui.expTxt, t.act, st);
+    updateHeader(t);
+    var ts = dayBy[TODAY.iso] ? dayStat(TODAY.iso) : { act: 0, plan: 0 };
+    timeNum(ui.tm, ts.act);
+    ui.tmSub.textContent = ts.plan ? "계획 " + fmtMin(ts.plan) : "계획 없는 날";
 
     var s = dayStat(sel);
     ui.sumDone.textContent = s.total ? s.done + " / " + s.total + "개" : "기록 " + extrasOf(sel).length + "개";
@@ -561,6 +674,12 @@
       if (!r) return;
       var on = !!state.done[it.id];
       r.card.classList.toggle("on", on);
+      if (on && r.on === false) {
+        r.card.classList.remove("pop");
+        void r.card.offsetWidth;
+        r.card.classList.add("pop");
+      }
+      r.on = on;
       r.chk.setAttribute("aria-checked", on ? "true" : "false");
       if (r.inp && document.activeElement !== r.inp) {
         var v = state.act[it.id];
@@ -821,43 +940,12 @@
     c.append(h);
     return c;
   }
-  function statBox(label, key) {
-    var w = el("div", "stat");
-    var dd = el("dd"), sm = el("small");
-    ui[key] = dd; ui[key + "Sub"] = sm;
-    w.append(el("dt", null, label), dd, sm);
-    return w;
-  }
 
   function mountTotal() {
     ui.cells = {}; ui.rows = {}; ui.dex = [];
-    var hero = el("header", "hero2");
-    var top = el("div", "h2-top");
-    var left = el("div");
-    left.append(el("div", "eyebrow", "정보처리기사 실기까지"));
-    ui.ddn = el("div", "dday");
-    left.append(ui.ddn, el("div", "exam-date", "2026년 10월 25일 (일)"));
-    top.append(left);
-
-    var grow = el("div", "grow");
-    ui.char = btn("char", null, "병아리에게 응원 듣기");
-    ui.char.addEventListener("click", function () { hop(); toast(CHEERS[cheerIdx++ % CHEERS.length]); });
-    var gi = el("div");
-    ui.lv = el("div", "lv");
-    ui.stName = el("h2");
-    ui.stLine = el("p");
-    var exp = el("div", "exp");
-    var tr = el("div", "exp-track");
-    ui.expFill = el("i");
-    tr.append(ui.expFill);
-    ui.expTxt = el("small");
-    exp.append(tr, ui.expTxt);
-    gi.append(ui.lv, ui.stName, ui.stLine, exp);
-    grow.append(ui.char, gi);
-
-    var stats = el("dl", "stats");
-    stats.append(statBox("총 공부", "stAct"), statBox("완료", "stDone"), statBox("계획 대비", "stPace"));
-    hero.append(top, grow, stats);
+    var b4 = el("section", "bento4");
+    b4.append(miniCard("", ICON_CHECK, "완료한 계획", "stDone"), miniCard("", ICON_PACE, "계획 대비", "stPace"));
+    var head = [topbar("계획·성장"), bentoTop("총 공부"), petCard(true), b4];
 
     var body = el("div", "body2");
 
@@ -878,6 +966,7 @@
 
     // 달력
     var cc = card("공부 달력", "날짜를 누르면 계획을 보고 고칠 수 있어요");
+    cc.classList.add("cal-card");
     var lg = el("div", "legend");
     lg.innerHTML = '<span><i class="lg-full"></i>다 했어요</span><span><i class="lg-part"></i>조금 했어요</span><span><i class="lg-none"></i>못 했어요</span><span><i class="lg-future"></i>남은 날</span>';
     var wdh = el("div", "cal-wd");
@@ -983,26 +1072,22 @@
     bRst.addEventListener("click", askReset);
 
     $screen.textContent = "";
-    $screen.append(hero, body);
+    head.forEach(function (n) { $screen.append(n); });
+    $screen.append(body);
     updateTotal();
   }
 
   function updateTotal() {
     var t = totals();
-    var st = stageOf(t.act);
-    ui.ddn.textContent = ddText();
-    setChar(ui.char, st);
-    ui.lv.textContent = "Lv." + (st + 1);
-    ui.stName.textContent = STAGES[st].name;
-    ui.stLine.textContent = STAGES[st].line;
-    expUpdate(ui.expFill, ui.expTxt, t.act, st);
+    var st = updateHeader(t);
+    if (!ui.hold) ui.bubble.textContent = STAGES[st].line;
 
-    ui.stAct.textContent = fmtH(t.act);
-    ui.stActSub.textContent = "계획 " + fmtH(t.plan);
-    ui.stDone.textContent = t.done + "/" + t.total;
-    ui.stDoneSub.textContent = "남은 " + (t.total - t.done) + "개";
+    timeNum(ui.tm, t.act);
+    ui.tmSub.textContent = "계획 " + fmtMin(t.plan);
+    bigNum(ui.stDone, t.done, "/" + t.total);
+    ui.stDoneSub.textContent = "남은 계획 " + (t.total - t.done) + "개";
     if (t.planNow > 0) {
-      ui.stPace.textContent = Math.round((t.actNow / t.planNow) * 100) + "%";
+      bigNum(ui.stPace, Math.round((t.actNow / t.planNow) * 100), "%");
       ui.stPaceSub.textContent = "오늘까지 기준";
     } else {
       ui.stPace.textContent = "-";

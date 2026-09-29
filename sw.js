@@ -1,6 +1,6 @@
 // 앱 파일을 폰에 캐시해서 오프라인에서도 열리게 합니다.
 // plan.js나 화면을 고쳐서 다시 올릴 때는 아래 버전 숫자를 올리세요.
-const CACHE = "itp-v2";
+const CACHE = "itp-v3";
 const ASSETS = ["./", "index.html", "app.js", "plan.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png"];
 
 self.addEventListener("install", (e) => {
@@ -20,7 +20,8 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
-  const isFont = url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com";
+  const isFont = url.hostname === "fonts.googleapis.com" || url.hostname === "fonts.gstatic.com" ||
+    (url.hostname === "cdn.jsdelivr.net" && url.pathname.indexOf("/gh/orioncactus/pretendard@") === 0);
   if (!sameOrigin && !isFont) return;
   e.respondWith(
     caches.open(CACHE).then((cache) =>
