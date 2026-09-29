@@ -338,6 +338,7 @@
     } else if (st < state.lv) {
       state.lv = st; save();
     }
+    checkItems();
   }
 
   /* ---------- character ---------- */
@@ -486,6 +487,108 @@
   }
   function charSVG(kind, st) { return kind === "monkey" || kind === "bear" ? animalSVG(kind, st) : chickSVG(st); }
 
+  /* ---------- 꾸미기 아이템 ---------- */
+  // 출석·연속 출석·계획 달성률로 얻는 아이템. 한 번 얻으면 사용자에게 계속 남고, 머리·얼굴·등 부위마다 하나씩 착용.
+  var SLOTS = [["head", "머리"], ["face", "얼굴"], ["back", "등"]];
+  var ITEMS = [
+    { id: "sprout", slot: "head", name: "새싹", cond: "첫 출석", test: function (a) { return a.days >= 1; }, prog: function () { return "하루만 공부하면 받아요"; } },
+    { id: "ribbon", slot: "head", name: "리본", cond: "연속 5일 출석", test: function (a) { return a.best >= 5; }, prog: function (a) { return "최고 연속 " + a.best + "일"; } },
+    { id: "flower", slot: "head", name: "꽃핀", cond: "연속 10일 출석", test: function (a) { return a.best >= 10; }, prog: function (a) { return "최고 연속 " + a.best + "일"; } },
+    { id: "starpin", slot: "head", name: "별 핀", cond: "연속 15일 출석", test: function (a) { return a.best >= 15; }, prog: function (a) { return "최고 연속 " + a.best + "일"; } },
+    { id: "crown", slot: "head", name: "왕관", cond: "계획 80% 달성", test: function (a) { return a.pct >= 80; }, prog: function (a) { return "지금 " + a.pct + "%"; } },
+    { id: "glasses", slot: "face", name: "동글 안경", cond: "계획 30% 달성", test: function (a) { return a.pct >= 30; }, prog: function (a) { return "지금 " + a.pct + "%"; } },
+    { id: "halo", slot: "back", name: "반짝 후광", cond: "계획 60% 달성", test: function (a) { return a.pct >= 60; }, prog: function (a) { return "지금 " + a.pct + "%"; } },
+    { id: "wings", slot: "back", name: "날개", cond: "연속 20일 출석", test: function (a) { return a.best >= 20; }, prog: function (a) { return "최고 연속 " + a.best + "일"; } }
+  ];
+  var ITEM_BY = {};
+  ITEMS.forEach(function (it) { ITEM_BY[it.id] = it; });
+
+  // 캐릭터·단계별 부착 위치: hx/hy 정수리, ey/edx 눈 높이·간격, by/bw 몸통 중심·반폭
+  function anchorOf(kind, st) {
+    var egg = { hx: 60, hy: 19, ey: 74.5, edx: 10, by: 72, bw: 34 };
+    if (st <= 1) return egg;
+    var animal = kind === "monkey" || kind === "bear", bear = kind === "bear";
+    if (!animal) return [null, null,
+      { hx: 60, hy: 27, ey: 60, edx: 10, by: 86, bw: 32 },
+      { hx: 60, hy: 40, ey: 67, edx: 10, by: 76, bw: 31 },
+      { hx: 60, hy: 32, ey: 61, edx: 11, by: 72, bw: 33 },
+      { hx: 60, hy: 28, ey: 64, edx: 11, by: 72, bw: 32 }][st];
+    if (st === 2) return { hx: 60, hy: 24, ey: 58, edx: bear ? 9 : 7.5, by: 88, bw: 32 };
+    if (st === 3) return { hx: 60, hy: bear ? 33 : 34, ey: 58, edx: bear ? 9 : 7.5, by: 94, bw: 21 };
+    return { hx: 60, hy: bear ? 29 : 28, ey: bear ? 53.4 : 52.8, edx: bear ? 9.7 : 8.1, by: 93, bw: 24 };
+  }
+  var STAR = "M0-6l1.8 3.8 4.2.5-3.1 2.9.8 4.2L0 3.4l-3.7 2 .8-4.2-3.1-2.9 4.2-.5z";
+  var ITEM_ART = {
+    sprout: function (a) {
+      return '<g transform="translate(' + a.hx + " " + (a.hy + 1) + ')"><path d="M0 2V-9" stroke="#4FA764" stroke-width="2.4" stroke-linecap="round"/><path d="M0-5q-9-7-13 0q7 5 13 0z" fill="#7ED9A6"/><path d="M0-8q8-8 13-1q-6 6-13 1z" fill="#95E3B0"/></g>';
+    },
+    ribbon: function (a) {
+      return '<g transform="translate(' + (a.hx + 11) + " " + (a.hy + 5) + ') rotate(-18)"><path d="M0 0L-10-7v14z" fill="#FF8FB0"/><path d="M0 0l10-7v14z" fill="#FF8FB0"/><path d="M0 0l-6 11M0 0l6 11" stroke="#FF8FB0" stroke-width="2.4" stroke-linecap="round"/><circle r="3.4" fill="#FF6E98"/></g>';
+    },
+    flower: function (a) {
+      var g = '<g transform="translate(' + (a.hx - 12) + " " + (a.hy + 6) + ')">';
+      for (var i = 0; i < 5; i++) { var r = (i * 72 - 90) * Math.PI / 180; g += circ(Math.cos(r) * 4, Math.sin(r) * 4, 3.4, "#FFB3C7"); }
+      return g + circ(0, 0, 2.6, "#FFD23F") + "</g>";
+    },
+    starpin: function (a) {
+      return '<g transform="translate(' + (a.hx + 12) + " " + (a.hy + 6) + ') rotate(12) scale(1.25)"><path d="' + STAR + '" fill="#FFD23F" stroke="#E0A800" stroke-width="1.1" stroke-linejoin="round"/></g>';
+    },
+    crown: function (a) {
+      return '<g transform="translate(' + a.hx + " " + (a.hy + 2) + ')"><path d="M-12 0l-2-12 7.5 5.5L0-16l6.5 9.5L14-12l-2 12z" fill="#FFD23F" stroke="#E0A800" stroke-width="1.6" stroke-linejoin="round"/>' + circ(0, -5, 2, "#FF6B6B") + circ(-7, -3, 1.4, "#7ED9A6") + circ(7, -3, 1.4, "#8FD0FA") + "</g>";
+    },
+    glasses: function (a) {
+      var r = Math.max(5.5, a.edx * 0.72), y = a.ey;
+      return '<g fill="rgba(255,255,255,.28)" stroke="#4A3B32" stroke-width="2">' +
+        '<circle cx="' + r1(a.hx - a.edx) + '" cy="' + y + '" r="' + r1(r) + '"/><circle cx="' + r1(a.hx + a.edx) + '" cy="' + y + '" r="' + r1(r) + '"/>' +
+        '<path d="M' + r1(a.hx - a.edx + r) + " " + y + "H" + r1(a.hx + a.edx - r) + '" fill="none"/></g>';
+    },
+    halo: function (a) {
+      return '<ellipse cx="' + a.hx + '" cy="' + (a.hy - 9) + '" rx="14" ry="4.2" fill="none" stroke="#FFD23F" stroke-width="3.2"/>' +
+        '<g transform="translate(' + (a.hx - 22) + " " + (a.hy - 2) + ') scale(.7)"><path d="' + STAR + '" fill="#FFE27A"/></g><g transform="translate(' + (a.hx + 23) + " " + (a.hy + 4) + ') scale(.55)"><path d="' + STAR + '" fill="#FFE27A"/></g>';
+    },
+    wings: function (a) {
+      var w = function (sx) {
+        return '<g transform="translate(' + r1(a.hx + sx * (a.bw - 2)) + " " + (a.by - 8) + ") scale(" + sx + ' 1)"><path d="M0 0q14-18 26-10q-2 6-8 7q7 3 4 9q-5 3-10 0q2 7-6 8q-6-4-6-14z" fill="#fff" stroke="#BFE0F5" stroke-width="2" stroke-linejoin="round"/></g>';
+      };
+      return w(1) + w(-1);
+    }
+  };
+  // 캐릭터 + 착용 아이템. 등 아이템은 몸 뒤, 머리·얼굴은 앞. 몸과 같은 통통 애니메이션을 받도록 class="body".
+  function dressSVG(kind, st, equip) {
+    var svg = charSVG(kind, st), a = anchorOf(kind, st), back = "", front = "";
+    equip = obj(equip);
+    if (equip.back && ITEM_ART[equip.back]) back = ITEM_ART[equip.back](a);
+    if (equip.face && ITEM_ART[equip.face]) front += ITEM_ART[equip.face](a);
+    if (equip.head && ITEM_ART[equip.head]) front += ITEM_ART[equip.head](a);
+    if (back) svg = svg.replace('<g class="body">', '<g class="body acc">' + back + '</g><g class="body">');
+    if (front) svg = svg.replace(/<\/svg>$/, '<g class="body acc">' + front + "</g></svg>");
+    return svg;
+  }
+  function itemStats() {
+    var days = 0;
+    DAYS.forEach(function (iso) { if (iso <= TODAY.iso && dayStat(iso).act > 0) days++; });
+    var t = totals();
+    return { days: days, best: streakInfo().best, pct: t.total ? Math.floor((t.done / t.total) * 100) : 0 };
+  }
+  function newItemCount() {
+    var seen = Array.isArray(USER.seenItems) ? USER.seenItems : [];
+    return Object.keys(obj(USER.items)).filter(function (id) { return seen.indexOf(id) < 0; }).length;
+  }
+  function checkItems() {
+    if (!USER || !EXAM) return;
+    USER.items = obj(USER.items);
+    var a = itemStats(), got = [];
+    ITEMS.forEach(function (it) {
+      if (!USER.items[it.id] && it.test(a)) { USER.items[it.id] = TODAY.iso; got.push(it); }
+    });
+    if (!got.length) return;
+    save();
+    if (ui.dressDot) ui.dressDot.hidden = false;
+    if (ui.itemCard) paintItemCard();
+    toast(got.length === 1 ? "🎁 새 아이템 '" + got[0].name + "' 획득! (" + got[0].cond + ")" : "🎁 아이템 " + got.length + "개 획득! 꾸미기에서 달아 보세요");
+    celebrate();
+  }
+
   function celebrate() {
     var host = ui.pet;
     if (!host || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
@@ -519,9 +622,10 @@
     return { cur: run, best: best, today: today };
   }
   function setChar(node, st) {
-    if (!node || node.dataset.st === String(st)) return;
-    node.dataset.st = String(st);
-    node.innerHTML = charSVG(CHAR, st);
+    var key = st + JSON.stringify(obj(USER && USER.equip));
+    if (!node || node.dataset.st === key) return;
+    node.dataset.st = key;
+    node.innerHTML = dressSVG(CHAR, st, USER && USER.equip);
   }
   function hop() {
     var c = ui.char;
@@ -599,14 +703,15 @@
   var ICON_CLOCK = '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#BFE6FF"/><path d="M12 7v5l3 2" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>';
   var ICON_CHECK = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#7ED9A6"/><path d="M7.5 12.5l3 3 6-6.5" stroke="#1F6B45" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var ICON_PACE = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="6" fill="#FFD23F"/><path d="M7 16l3.5-4 3 2.5L17 9" stroke="#4A3B32" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var ICON_BOW = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12L3 6.5v11z" fill="#FF8FB0"/><path d="M12 12l9-5.5v11z" fill="#FF8FB0"/><circle cx="12" cy="12" r="3.2" fill="#FF6E98"/></svg>';
   var ICON_PENCIL ='<svg viewBox="0 0 80 80" aria-hidden="true"><g transform="rotate(-38 40 40)"><rect x="30" y="4" width="20" height="54" rx="4" fill="#FFF3C9"/><rect x="30" y="4" width="20" height="10" rx="4" fill="#FF9FB0"/><path d="M30 58h20l-10 18z" fill="#FFE0B0"/><path d="M36.5 70h7l-3.5 6z" fill="#4A3B32"/></g></svg>';
 
   // 누구의 어떤 시험인지 보여주고, 누르면 시험 고르기(다른 시험·사용자 바꾸기) 화면으로
   function topbar() {
     var t = el("div", "topbar");
     var b = btn("brand", null, "시험 바꾸기 또는 사용자 바꾸기");
-    var av = el("span", "avatar");
-    av.innerHTML = charSVG(CHAR, 3);
+    var av = ui.topAv = el("span", "avatar");
+    av.innerHTML = dressSVG(CHAR, 3, USER.equip);
     var txt = el("span", "who");
     txt.append(el("b", null, USER.name), el("small", null, EXAM.name));
     b.append(av, txt);
@@ -662,7 +767,14 @@
     tr.append(ui.expFill);
     ui.expTxt = el("div", "exp-txt");
     meta.append(nm, tr, ui.expTxt);
-    p.append(ui.bubble, ui.char, meta);
+    var dress = btn("dress-btn", null, "캐릭터 꾸미기");
+    dress.innerHTML = ICON_BOW;
+    dress.append(el("span", null, "꾸미기"));
+    ui.dressDot = el("i", "new-dot");
+    ui.dressDot.hidden = !newItemCount();
+    dress.append(ui.dressDot);
+    dress.addEventListener("click", openDressSheet);
+    p.append(ui.bubble, ui.char, dress, meta);
     return p;
   }
   function bigNum(node, num, unit) {
@@ -1124,6 +1236,73 @@
     checkLevel(totals().act);
   }
 
+  /* ---------- 꾸미기 시트 · 아이템 카드 ---------- */
+  function itemTile(it, a, cls) {
+    var own = !!obj(USER.items)[it.id];
+    var eq = {};
+    eq[it.slot] = it.id;
+    var t = btn("dress-item" + (own ? "" : " locked") + (cls ? " " + cls : ""));
+    var art = el("span", "dress-art");
+    art.innerHTML = dressSVG(CHAR, 3, eq);
+    t.append(art, el("b", null, it.name), el("small", null, own ? it.cond : it.cond + " · " + it.prog(a)));
+    if (!own) t.append(el("span", "lock", "🔒"));
+    t.setAttribute("aria-label", it.name + (own ? " (" + it.cond + ")" : " 잠김: " + it.cond + ", " + it.prog(a)));
+    return t;
+  }
+  function refreshDressed() {
+    if (ui.char) setChar(ui.char, stageOf(totals().act));
+    if (ui.topAv) ui.topAv.innerHTML = dressSVG(CHAR, 3, USER.equip);
+  }
+  function openDressSheet() {
+    USER.items = obj(USER.items);
+    USER.equip = obj(USER.equip);
+    USER.seenItems = Object.keys(USER.items);
+    save();
+    if (ui.dressDot) ui.dressDot.hidden = true;
+    var st = stageOf(totals().act), a = itemStats();
+    openSheet("캐릭터 꾸미기", function (sh) {
+      var pv = el("div", "dress-preview");
+      function paint() { pv.innerHTML = dressSVG(CHAR, st, USER.equip); }
+      paint();
+      var own = Object.keys(USER.items).length;
+      sh.body.append(pv, el("p", "sh-sum center", "모은 아이템 " + own + " / " + ITEMS.length + " · 부위마다 하나씩 달 수 있어요"));
+      SLOTS.forEach(function (sl) {
+        var slot = sl[0];
+        var sec = el("div", "dress-sec");
+        sec.append(el("h3", null, sl[1]));
+        var g = el("div", "dress-grid");
+        ITEMS.filter(function (it) { return it.slot === slot; }).forEach(function (it) {
+          var t = itemTile(it, a);
+          var mine = !!USER.items[it.id];
+          t.setAttribute("aria-pressed", String(USER.equip[slot] === it.id));
+          if (!mine) t.setAttribute("aria-disabled", "true");
+          t.addEventListener("click", function () {
+            if (!mine) { toast("🔒 " + it.cond + "하면 받을 수 있어요"); return; }
+            USER.equip[slot] = USER.equip[slot] === it.id ? null : it.id;
+            save();
+            [].forEach.call(g.children, function (x) { x.setAttribute("aria-pressed", "false"); });
+            t.setAttribute("aria-pressed", String(USER.equip[slot] === it.id));
+            paint();
+            refreshDressed();
+          });
+          g.append(t);
+        });
+        sec.append(g);
+        sh.body.append(sec);
+      });
+    });
+  }
+  function paintItemCard() {
+    var c = ui.itemCard, a = itemStats();
+    c.grid.textContent = "";
+    ITEMS.forEach(function (it) {
+      var t = itemTile(it, a, "mini");
+      t.addEventListener("click", openDressSheet);
+      c.grid.append(t);
+    });
+    c.count.textContent = Object.keys(obj(USER.items)).length + " / " + ITEMS.length + "개";
+  }
+
   /* ---------- 계획·성장 ---------- */
   function card(title, sub) {
     var c = el("section", "card");
@@ -1156,6 +1335,18 @@
     });
     dx.append(grid);
     body.append(dx);
+
+    // 아이템 모으기
+    var ic = card("아이템 모으기", "출석·연속 출석·계획 달성으로 받아요");
+    var ig = el("div", "dress-grid");
+    var icount = el("p", "sh-sum");
+    var go = btn("btn primary block", "캐릭터 꾸미러 가기");
+    go.style.marginTop = "12px";
+    go.addEventListener("click", openDressSheet);
+    ic.append(icount, ig, go);
+    ui.itemCard = { grid: ig, count: icount };
+    paintItemCard();
+    body.append(ic);
 
     // 달력
     var cc = card("공부 달력", "날짜를 누르면 계획을 보고 고칠 수 있어요");
@@ -1441,9 +1632,9 @@
     STAGE_FRAC.forEach(function (f, i) { if (a >= Math.round((goal * f) / 10) * 10) s = i; });
     return s;
   }
-  function avatar(kind, st, cls) {
+  function avatar(kind, st, cls, equip) {
     var a = el("span", "avatar" + (cls ? " " + cls : ""));
-    a.innerHTML = charSVG(kind, st == null ? 3 : st);
+    a.innerHTML = dressSVG(kind, st == null ? 3 : st, equip);
     return a;
   }
   function screenHead(title, sub, backTo) {
@@ -1469,7 +1660,7 @@
       var c = btn("ucard");
       var ex = examsOf(u);
       var best = ex.reduce(function (m, e) { return Math.max(m, examStage(e)); }, 0);
-      c.append(avatar(u.char, Math.max(best, 2), "lg"), el("b", null, u.name), el("small", null, ex.length ? ex.map(function (e) { return e.name; }).join(" · ") : "시험 없음"));
+      c.append(avatar(u.char, Math.max(best, 2), "lg", u.equip), el("b", null, u.name), el("small", null, ex.length ? ex.map(function (e) { return e.name; }).join(" · ") : "시험 없음"));
       c.addEventListener("click", function () { go("lock/" + u.id); });
       grid.append(c);
     });
@@ -1520,7 +1711,7 @@
       if (/^\d$/.test(e.key)) press(e.key);
       else if (e.key === "Backspace") press("del");
     });
-    wrap.append(avatar(u.char, 3, "xl"), dots, msg, pad4);
+    wrap.append(avatar(u.char, 3, "xl", u.equip), dots, msg, pad4);
     $screen.append(head, wrap);
   }
 
@@ -1534,7 +1725,7 @@
       var main = btn("exam-main");
       var info = el("span", "exam-info");
       info.append(el("b", null, ex.name), el("small", null, examDateLabel(ex.date) + " · 공부 " + fmtMin(examAct(ex))));
-      main.append(avatar(u.char, examStage(ex)), info, el("span", "dd-pill", ddOf(ex)));
+      main.append(avatar(u.char, examStage(ex), null, u.equip), info, el("span", "dd-pill", ddOf(ex)));
       main.addEventListener("click", function () { openExam(ex); go("today"); });
       var del = btn("link small-del", "삭제", ex.name + " 삭제");
       del.addEventListener("click", function () {
@@ -1886,6 +2077,7 @@
     if (route === "today") { tt.setAttribute("aria-current", "page"); tl.removeAttribute("aria-current"); }
     else { tl.setAttribute("aria-current", "page"); tt.removeAttribute("aria-current"); }
     if (route === "today") mountToday(); else mountTotal();
+    checkItems();
   }
 
   TODAY = todayInfo();

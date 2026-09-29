@@ -329,6 +329,31 @@ h1, h2, h3, p { margin: 0; }
 #toast { position: fixed; left: 50%; top: calc(14px + env(safe-area-inset-top, 0px)); transform: translate(-50%, -150%); opacity: 0; visibility: hidden; z-index: 60; background: var(--ink); color: #FFF8E1; padding: 12px 20px; border-radius: 20px; font: 400 17px var(--font-cute); box-shadow: 0 10px 30px rgba(74, 59, 50, .25); transition: transform .35s cubic-bezier(.3, 1.4, .5, 1), opacity .3s; width: max-content; max-width: calc(100% - 32px); text-align: center; }
 #toast.show { transform: translate(-50%, 0); opacity: 1; visibility: visible; }
 
+/* ---------- 꾸미기 ---------- */
+.pet .dress-btn { position: absolute; right: 12px; top: 96px; z-index: 3; width: 56px; min-height: 58px; padding: 6px 0 5px; border-radius: 18px; border: 2px solid #F5C6D4; border-bottom-width: 4px; background: #fff; display: grid; justify-items: center; gap: 1px; font: 400 12px var(--font-cute); color: var(--ink); }
+.pet .dress-btn:active { transform: translateY(2px); border-bottom-width: 2px; }
+.dress-btn svg { width: 26px; height: 26px; }
+.new-dot { position: absolute; top: -4px; right: -4px; width: 14px; height: 14px; border-radius: 50%; background: #FF6B6B; border: 2.5px solid #fff; }
+.dress-preview { width: 170px; height: 170px; margin: 0 auto; border-radius: 50%; background: linear-gradient(180deg, var(--sky), var(--sky-2)); border: 2px solid #A6D6F5; display: grid; place-items: center; }
+.dress-preview svg { width: 86%; height: 86%; overflow: visible; }
+.dress-sec h3 { font: 400 17px var(--font-cute); margin: 2px 2px 8px; }
+.dress-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dress-item { position: relative; display: grid; justify-items: center; align-content: start; gap: 2px; padding: 8px 4px 9px; border-radius: 18px; border: 2px solid var(--card-line); border-bottom-width: 4px; background: #fff; text-align: center; min-height: 44px; }
+.dress-item:active { transform: translateY(2px); border-bottom-width: 2px; }
+.dress-item .dress-art { width: 64px; height: 64px; display: block; }
+.dress-item .dress-art svg { width: 100%; height: 100%; overflow: visible; }
+.dress-item b { font: 400 14.5px/1.25 var(--font-cute); }
+.dress-item small { font-size: 11px; color: var(--muted); font-weight: 600; line-height: 1.3; word-break: keep-all; }
+.dress-item[aria-pressed="true"] { background: #FFF1F5; border-color: #FF8FB0; box-shadow: 0 0 0 3px rgba(255, 143, 176, .3); }
+.dress-item[aria-pressed="true"]::after { content: "착용 중"; position: absolute; top: -8px; left: 50%; transform: translateX(-50%); background: #FF8FB0; color: var(--ink); font: 400 11px/1 var(--font-cute); padding: 4px 7px; border-radius: 999px; white-space: nowrap; }
+.dress-item.locked { background: #F7F0DE; }
+.dress-item.locked .dress-art { filter: grayscale(1) opacity(.35); }
+.dress-item.locked b { color: var(--faint); }
+.dress-item .lock { position: absolute; top: 6px; right: 7px; font-size: 13px; }
+.dress-item.mini { padding: 6px 2px 7px; }
+.dress-item.mini .dress-art { width: 52px; height: 52px; }
+.dress-item.mini small { font-size: 10.5px; }
+
 /* ---------- 사용자 · 시험 · 설정 화면 ---------- */
 .brand { border: 0; background: none; padding: 4px 6px 4px 0; min-height: 48px; text-align: left; cursor: pointer; border-radius: var(--r-btn); }
 .brand > svg { width: 18px; height: 18px; color: var(--muted); flex: none; }
