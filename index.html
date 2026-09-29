@@ -14,6 +14,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="preload" href="fonts/jua/Jua-Regular.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/pretendard/Pretendard-SemiBold.subset.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts/fonts.css">
 <style>
@@ -56,7 +57,7 @@
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 [hidden] { display: none !important; }
 html { background: var(--bg); -webkit-text-size-adjust: 100%; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 500 15px/1.55 var(--font-body); letter-spacing: -0.01em; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 500 15px/1.55 var(--font-body); letter-spacing: -0.01em; font-synthesis: none; -webkit-font-smoothing: antialiased; }
 body.noscroll { overflow: hidden; }
 button, input, textarea, select { font: inherit; color: inherit; letter-spacing: inherit; }
 button { cursor: pointer; }

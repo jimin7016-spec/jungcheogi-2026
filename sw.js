@@ -1,8 +1,8 @@
 // 앱 파일을 폰에 캐시해서 오프라인에서도 열리게 합니다.
 // plan.js나 화면을 고쳐서 다시 올릴 때는 아래 버전 숫자를 올리세요.
-const CACHE = "itp-v9";
+const CACHE = "itp-v10";
 const ASSETS = ["./", "index.html", "app.js", "plan.js", "manifest.webmanifest", "icon-192.png", "icon-512.png", "apple-touch-icon.png",
-  "fonts/fonts.css", "fonts/pretendard/Pretendard-Medium.subset.woff2", "fonts/pretendard/Pretendard-SemiBold.subset.woff2", "fonts/pretendard/Pretendard-Bold.subset.woff2"];
+  "fonts/fonts.css", "fonts/jua/Jua-Regular.woff2", "fonts/pretendard/Pretendard-Medium.subset.woff2", "fonts/pretendard/Pretendard-SemiBold.subset.woff2", "fonts/pretendard/Pretendard-Bold.subset.woff2"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
