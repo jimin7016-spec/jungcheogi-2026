@@ -677,6 +677,7 @@
   function updateHeader(t) {
     var st = stageOf(t.act);
     ui.ddn.textContent = ddText();
+    ui.ddn.classList.toggle("long", ui.ddn.textContent.length > 5);
     ui.lvChip.textContent = "";
     ui.lvChip.append(el("b", null, "Lv." + (st + 1)), document.createTextNode(STAGES[st].name));
     setChar(ui.char, st);
@@ -821,7 +822,7 @@
       items.forEach(function (it) { ui.body.append(taskCard(it)); });
     } else {
       var rest = el("section", "card rest-card");
-      rest.append(el("h2", null, "계획 없는 날이에요"), el("p", null, "쉬어도 좋고, 공부했다면 아래에 기록하면 병아리가 자라요."));
+      rest.append(el("h2", null, "계획 없는 날이에요"), el("p", null, "쉬어도 좋고, 공부했다면 아래에 기록하면 캐릭터가 자라요."));
       ui.body.append(rest);
     }
 
@@ -1571,7 +1572,7 @@
     var ch = btn("btn small", "캐릭터 바꾸기");
     ch.addEventListener("click", function () {
       openSheet("캐릭터 바꾸기", function (sh) {
-        sh.body.append(charPicker(u.char, function (k) { u.char = k; save(); sh.close(); render(); }));
+        sh.body.append(charPicker(u.char, function (k) { u.char = k; EXAM = null; save(); sh.close(); render(); }));
       });
     });
     var sw = btn("btn small", "사용자 바꾸기");
@@ -1889,7 +1890,7 @@
     if (h === "exams") return examsScreen();
     var list = examsOf(USER);
     if (!list.length) return go("add-exam");
-    if (!EXAM || USER.exams.indexOf(EXAM.id) < 0 || store.exams[EXAM.id] !== EXAM) {
+    if (!EXAM || USER.exams.indexOf(EXAM.id) < 0 || store.exams[EXAM.id] !== EXAM || CHAR !== USER.char) {
       openExam(store.exams[USER.lastExam] && USER.exams.indexOf(USER.lastExam) >= 0 ? store.exams[USER.lastExam] : list[0]);
     }
     route = h === "total" ? "total" : "today";
